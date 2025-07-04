@@ -1,0 +1,75 @@
+###############################################
+# 🛠️ Build & Runtime Artifacts
+###############################################
+bin/
+obj/
+*.user
+*.vs/
+*.dbmdl
+*.pidb
+*.suo
+
+###############################################
+# ⚙️ Configuration & Secrets
+###############################################
+secrets.json
+appsettings.json
+appsettings.Development.json
+.env
+.env.*
+.vscode/launch.json
+
+# For Rider or JetBrains
+.idea/
+
+###############################################
+# 📁 Logs & Publish Output
+###############################################
+*.log
+*.tlog
+*.DS_Store
+*.publish/
+*.PublishTmp/
+publish/
+wwwroot/lib/
+node_modules/
+
+###############################################
+# 📦 NuGet Packages
+###############################################
+*.nupkg
+*.snupkg
+packages/
+*.nuspec
+
+###############################################
+# 🔐 Sensitive Config Files 
+###############################################
+web.config          
+Properties/PublishProfiles/
+**/*.pubxml
+**/*.pubxml.user
+
+###############################################
+# 💡 IDE Helper Files
+###############################################
+*.swp
+*.bak
+*.tmp
+*.orig
+*.sublime-project
+*.sublime-workspace
+
+# Rider & VS Code folders
+.idea/
+.vscode/
+
+###############################################
+# 🌐 Front-End Extras 
+###############################################
+node_modules/
+dist/
+.env.local
+.env.development
+.env.production
+*.map
