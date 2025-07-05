@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Talaby.Application.Common;
-using Talaby.Application.Projects.ProjectRequests.Dtos;
+using Talaby.Application.Projects.ProjectRequests.Queries.Dtos;
 using Talaby.Application.Users.Dtos;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Repositories.Projects;

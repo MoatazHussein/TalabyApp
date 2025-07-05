@@ -6,29 +6,35 @@ namespace Talaby.Application.Users
 {
     public interface IUserContext
     {
-        CurrentUser? GetCurrentUser();
+        CurrentUser GetCurrentUser();
     }
 
-    public class UserContext(IHttpContextAccessor httpContextAccessor) : IUserContext
+    public class UserContext : IUserContext
     {
-        public CurrentUser? GetCurrentUser()
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public UserContext(IHttpContextAccessor httpContextAccessor)
         {
-            var user = httpContextAccessor?.HttpContext?.User;
-            if (user == null)
-            {
-                throw new InvalidOperationException("AppUser context is not present");
-            }
+            _httpContextAccessor = httpContextAccessor;
+        }
 
-            if (user.Identity == null || !user.Identity.IsAuthenticated)
-            {
-                return null;
-            }
+        public CurrentUser GetCurrentUser()
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
 
-            var userId = Guid.TryParse(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value, out var id) ? id : throw new UnAuthorizedAccessException("User ID invalid");
-            var email = user.FindFirst(c => c.Type == ClaimTypes.Email)!.Value;
-            var roles = user.Claims.Where(c => c.Type == ClaimTypes.Role)!.Select(c => c.Value);
+            if (user == null || !user.Identity?.IsAuthenticated == true)
+                throw new UnAuthorizedAccessException("User is not authenticated.");
+
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                throw new UnAuthorizedAccessException("Invalid or missing User ID.");
+
+            var email = user.FindFirst(ClaimTypes.Email)?.Value ?? throw new UnAuthorizedAccessException("Email claim is missing.");
+
+            var roles = user.FindAll(ClaimTypes.Role).Select(r => r.Value).ToList();
 
             return new CurrentUser(userId, email, roles);
         }
     }
+
 }

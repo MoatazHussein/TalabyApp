@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace Talaby.Application.Projects.ProjectRequests.Commands.CreateProjectRequest;
+namespace Talaby.Application.Projects.ProjectRequests.Commands.UpdateProjectRequest;
 
-public class CreateProjectRequestHandlerValidator : AbstractValidator<CreateProjectRequestCommand>
+public class UpdateProjectRequestCommandHandlerValidator : AbstractValidator<UpdateProjectRequestCommand>
 {
-    public CreateProjectRequestHandlerValidator()
+    public UpdateProjectRequestCommandHandlerValidator()
     {
         RuleFor(x => x.Description)
                 .NotEmpty().WithMessage("Description is required.")

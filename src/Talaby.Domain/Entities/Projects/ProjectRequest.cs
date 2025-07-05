@@ -15,5 +15,5 @@ public class ProjectRequest
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    //public ICollection<ProjectProposal> Proposals { get; set; } = new List<ProjectProposal>();
+    public ICollection<ProjectProposal> Proposals { get; set; } = new List<ProjectProposal>();
 }

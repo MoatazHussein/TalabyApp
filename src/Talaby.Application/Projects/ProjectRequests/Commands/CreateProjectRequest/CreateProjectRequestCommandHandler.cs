@@ -1,8 +1,6 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Talaby.Application.Users;
 using Talaby.Domain.Entities.Projects;
-using Talaby.Domain.Exceptions;
 using Talaby.Domain.Repositories.Projects;
 
 namespace Talaby.Application.Projects.ProjectRequests.Commands.CreateProjectRequest;
@@ -15,8 +13,6 @@ public class CreateProjectRequestCommandHandler(IProjectRequestRepository reposi
     public async Task<Guid> Handle(CreateProjectRequestCommand request, CancellationToken cancellationToken)
     {
 
-        var userId = _userContext.GetCurrentUser()!.Id;
-
         var entity = new ProjectRequest
         {
             Title = request.Title,
@@ -24,7 +20,7 @@ public class CreateProjectRequestCommandHandler(IProjectRequestRepository reposi
             MinBudget = request.MinBudget,
             MaxBudget = request.MaxBudget,
             StoreCategoryId = request.StoreCategoryId,
-            CreatorId = userId,
+            CreatorId = _userContext.GetCurrentUser().Id,
             CreatedAt = DateTime.UtcNow
         };
 

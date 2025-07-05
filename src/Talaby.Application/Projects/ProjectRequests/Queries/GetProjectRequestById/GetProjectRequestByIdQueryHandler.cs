@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Talaby.Application.Projects.ProjectRequests.Dtos;
+using Talaby.Application.Projects.ProjectRequests.Queries.Dtos;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Exceptions;
 using Talaby.Domain.Repositories.Projects;

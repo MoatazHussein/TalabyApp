@@ -12,6 +12,8 @@ public class TalabyDbContext : IdentityDbContext<AppUser, AppRole, Guid>
 
     public DbSet<StoreCategory> StoreCategories { get; set; }
     public DbSet<ProjectRequest> ProjectRequests { get; set; }
+    public DbSet<ProjectProposal> ProjectProposals { get; set; }
+    public DbSet<ProposalReply> ProposalReplies { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

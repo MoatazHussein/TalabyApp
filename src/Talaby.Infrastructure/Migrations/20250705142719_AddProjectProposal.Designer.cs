@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Talaby.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Talaby.Infrastructure.Persistence;
 namespace Talaby.Infrastructure.Migrations
 {
     [DbContext(typeof(TalabyDbContext))]
-    partial class TalabyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250705142719_AddProjectProposal")]
+    partial class AddProjectProposal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -326,35 +329,6 @@ namespace Talaby.Infrastructure.Migrations
                     b.ToTable("ProjectRequests");
                 });
 
-            modelBuilder.Entity("Talaby.Domain.Entities.Projects.ProposalReply", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProjectProposalId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatorId");
-
-                    b.HasIndex("ProjectProposalId");
-
-                    b.ToTable("ProposalReplies");
-                });
-
             modelBuilder.Entity("Talaby.Domain.Entities.StoreCategory", b =>
                 {
                     b.Property<int>("Id")
@@ -487,30 +461,6 @@ namespace Talaby.Infrastructure.Migrations
                     b.Navigation("Creator");
 
                     b.Navigation("StoreCategory");
-                });
-
-            modelBuilder.Entity("Talaby.Domain.Entities.Projects.ProposalReply", b =>
-                {
-                    b.HasOne("Talaby.Domain.Entities.AppUser", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Talaby.Domain.Entities.Projects.ProjectProposal", "ProjectProposal")
-                        .WithMany("Replies")
-                        .HasForeignKey("ProjectProposalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("ProjectProposal");
-                });
-
-            modelBuilder.Entity("Talaby.Domain.Entities.Projects.ProjectProposal", b =>
-                {
-                    b.Navigation("Replies");
                 });
 #pragma warning restore 612, 618
         }

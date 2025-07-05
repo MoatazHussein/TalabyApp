@@ -1,4 +1,4 @@
-﻿namespace Talaby.Application.Projects.ProjectRequests.Dtos;
+﻿namespace Talaby.Application.Projects.ProjectRequests.Queries.Dtos;
 
 public class ProjectRequestDto
 {

@@ -16,8 +16,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
         builder => builder
-        //.WithOrigins("http://localhost:3000", "https://iqdam1.vercel.app/")
-        .AllowAnyOrigin()
+        //.AllowAnyOrigin()
+        .WithOrigins("http://localhost:3000", "https://talaby.vercel.app/")
         .AllowAnyHeader()
         .AllowAnyMethod());
 });

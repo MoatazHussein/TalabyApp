@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Talaby.Application.Projects.ProjectRequests.Dtos;
+using Talaby.Application.Projects.ProjectRequests.Queries.Dtos;
 
 namespace Talaby.Application.Projects.ProjectRequests.Queries.GetProjectRequestById;
 
