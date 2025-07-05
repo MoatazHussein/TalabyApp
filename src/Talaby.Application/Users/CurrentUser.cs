@@ -1,6 +1,6 @@
 ﻿namespace Talaby.Application.Users;
 
-public record CurrentUser(string Id,
+public record CurrentUser(Guid Id,
     string Email,
     IEnumerable<string> Roles)
 {

@@ -17,8 +17,4 @@
     <ProjectReference Include="..\Talaby.Domain\Talaby.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="StoreCategories\Dtos\" />
-  </ItemGroup>
-
 </Project>

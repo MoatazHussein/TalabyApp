@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using Talaby.Domain.Exceptions;
 
 namespace Talaby.Application.Users
 {
@@ -23,7 +24,7 @@ namespace Talaby.Application.Users
                 return null;
             }
 
-            var userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
+            var userId = Guid.TryParse(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value, out var id) ? id : throw new UnAuthorizedAccessException("User ID invalid");
             var email = user.FindFirst(c => c.Type == ClaimTypes.Email)!.Value;
             var roles = user.Claims.Where(c => c.Type == ClaimTypes.Role)!.Select(c => c.Value);
 

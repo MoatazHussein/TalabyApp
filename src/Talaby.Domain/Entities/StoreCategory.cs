@@ -1,4 +1,6 @@
-﻿namespace Talaby.Domain.Entities;
+﻿using Talaby.Domain.Entities.Projects;
+
+namespace Talaby.Domain.Entities;
 
 public class StoreCategory
 {
@@ -7,5 +9,7 @@ public class StoreCategory
     public string NameEn { get; set; } = default!;
     public string? Description { get; set; } 
     public string? ImageUrl { get; set; }
+
+    //public ICollection<ProjectRequest> ProjectRequests { get; set; } = new List<ProjectRequest>();
 
 }

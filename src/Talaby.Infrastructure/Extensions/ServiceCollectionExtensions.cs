@@ -4,10 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Talaby.Application.Common.Interfaces;
 using Talaby.Domain.Entities;
 using Talaby.Domain.Repositories;
+using Talaby.Domain.Repositories.Projects;
 using Talaby.Infrastructure.Email;
 using Talaby.Infrastructure.Identity;
 using Talaby.Infrastructure.Persistence;
 using Talaby.Infrastructure.Repositories;
+using Talaby.Infrastructure.Repositories.Projects;
 using Talaby.Infrastructure.Seeders;
 
 namespace Talaby.Infrastructure.Extensions;
@@ -31,6 +33,8 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<ITalabySeeder, TalabySeeder>();
         services.AddScoped<IStoreCategoryRepository, StoreCategoryRepository>();
+        services.AddScoped<IProjectRequestRepository, ProjectRequestRepository>();
+
 
     }
 

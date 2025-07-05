@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Talaby.Domain.Entities;
+using Talaby.Domain.Exceptions;
 
 namespace Talaby.Application.Users.Commands.ConfirmEmail
 {
@@ -17,7 +18,12 @@ namespace Talaby.Application.Users.Commands.ConfirmEmail
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
-                return false;
+                throw new NotFoundException(nameof(AppUser), request.Email.ToString());
+
+            if (user.EmailConfirmed)
+            {
+                throw new BusinessRuleException("Email already confirmed", 200, "EMAIL_ALREADY_CONFIRMED");
+            }
 
             var result = await _userManager.ConfirmEmailAsync(user, request.Token);
 

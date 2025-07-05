@@ -44,6 +44,10 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
             context.Response.StatusCode = 500;
             await context.Response.WriteAsync("Database update failed");
         }
+        catch (BusinessRuleException ex) 
+        {
+            await context.Response.WriteAsync(ex.Message);
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, ex.Message);

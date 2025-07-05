@@ -7,7 +7,7 @@ using Talaby.Application.StoreCategories.Queries.GetAllStoreCategories;
 using Talaby.Application.StoreCategories.Queries.GetStoreCategoryById;
 using Talaby.Domain.Entities;
 
-namespace StoreCategorys.API.Controllers
+namespace Talaby.API.Controllers
 {
     [ApiController]
     [Route("api/storeCategories")]
@@ -39,7 +39,7 @@ namespace StoreCategorys.API.Controllers
 
 
         [HttpPatch()]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateStoreCategory(UpdateStoreCategoryCommand command)
         {
@@ -52,7 +52,7 @@ namespace StoreCategorys.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteStoreCategory([FromRoute] int id)
         {

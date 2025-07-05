@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Talaby.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Talaby.Infrastructure.Persistence;
 namespace Talaby.Infrastructure.Migrations
 {
     [DbContext(typeof(TalabyDbContext))]
-    partial class TalabyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250704224010_AddProjectRequest")]
+    partial class AddProjectRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -290,7 +293,7 @@ namespace Talaby.Infrastructure.Migrations
 
                     b.HasIndex("StoreCategoryId");
 
-                    b.ToTable("ProjectRequests", (string)null);
+                    b.ToTable("ProjectRequests");
                 });
 
             modelBuilder.Entity("Talaby.Domain.Entities.StoreCategory", b =>
@@ -325,7 +328,7 @@ namespace Talaby.Infrastructure.Migrations
                     b.HasIndex("NameEn")
                         .IsUnique();
 
-                    b.ToTable("StoreCategories", (string)null);
+                    b.ToTable("StoreCategories");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
