@@ -25,7 +25,7 @@ namespace Talaby.Application.Users.Commands.ConfirmEmail
                 throw new BusinessRuleException("Email already confirmed", 200, "EMAIL_ALREADY_CONFIRMED");
             }
 
-            var result = await _userManager.ConfirmEmailAsync(user, request.Token);
+            var result = await _userManager.ConfirmEmailAsync(user, Uri.UnescapeDataString(request.Token));
 
             return result.Succeeded;
 
