@@ -28,7 +28,8 @@ public class ProposalReplyReadRepository(TalabyDbContext context) : IProposalRep
                 Id = r.Id,
                 Content = r.Content,
                 CreatedAt = r.CreatedAt,
-                CreatorEmail = r.Creator.Email
+                CreatorEmail = r.Creator.Email,
+                CreatorCommercialRegisterNumber = r.Creator.CommercialRegisterNumber
             })
             .ToListAsync(cancellationToken);
 

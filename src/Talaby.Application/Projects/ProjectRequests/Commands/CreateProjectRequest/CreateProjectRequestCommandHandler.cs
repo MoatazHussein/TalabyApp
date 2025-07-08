@@ -17,6 +17,7 @@ public class CreateProjectRequestCommandHandler(IProjectRequestRepository reposi
         {
             Title = request.Title,
             Description = request.Description,
+            ImageUrl = request.ImageUrl,
             MinBudget = request.MinBudget,
             MaxBudget = request.MaxBudget,
             StoreCategoryId = request.StoreCategoryId,

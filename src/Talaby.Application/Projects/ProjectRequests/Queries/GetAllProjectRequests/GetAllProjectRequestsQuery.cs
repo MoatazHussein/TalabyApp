@@ -7,6 +7,7 @@ namespace Talaby.Application.Projects.ProjectRequests.Queries.GetAllProjectReque
 
 public class GetAllProjectRequestsQuery : IRequest<PagedResult<ProjectRequestDto>>
 {
+    public int StoreCategoryId { get; set; }
     public string? SearchPhrase { get; set; }
     public int PageNumber { get; set; }
     public int PageSize { get; set; }

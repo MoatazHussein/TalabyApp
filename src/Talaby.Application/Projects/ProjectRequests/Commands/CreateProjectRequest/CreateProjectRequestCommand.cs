@@ -5,6 +5,7 @@ namespace Talaby.Application.Projects.ProjectRequests.Commands.CreateProjectRequ
 public record CreateProjectRequestCommand(
 string Title,
 string Description,
+string ImageUrl,
 decimal MinBudget,
 decimal MaxBudget,
 int StoreCategoryId

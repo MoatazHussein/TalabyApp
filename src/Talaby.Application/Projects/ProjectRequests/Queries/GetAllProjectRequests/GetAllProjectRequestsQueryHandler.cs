@@ -17,7 +17,7 @@ public class GetAllProjectRequestsQueryHandler(ILogger<GetAllProjectRequestsQuer
     public async Task<PagedResult<ProjectRequestDto>> Handle(GetAllProjectRequestsQuery request, CancellationToken cancellationToken)
     {
         logger.LogInformation("Getting all Project Requests");
-        var (projectRequests, totalCount) = await ProjectRequestRepository.GetAllMatchingAsync(request.SearchPhrase,
+        var (projectRequests, totalCount) = await ProjectRequestRepository.GetAllMatchingAsync(request.StoreCategoryId, request.SearchPhrase,
             request.PageSize,
             request.PageNumber,
             request.SortBy,

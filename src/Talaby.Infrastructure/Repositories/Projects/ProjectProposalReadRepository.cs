@@ -29,8 +29,10 @@ public class ProjectProposalReadRepository(TalabyDbContext context) : IProjectPr
                 ProposedAmount = p.ProposedAmount,
                 CreatedAt = p.CreatedAt,
                 CreatorEmail = p.Creator.Email,
+                CreatorCommercialRegisterNumber = p.Creator.CommercialRegisterNumber,
                 RepliesCount = p.Replies.Count
             })
+            .OrderBy(p => p.ProposedAmount).ThenBy(p => p.CreatedAt)
             .ToListAsync(cancellationToken);
 
         return new PagedResult<ProjectProposalListItemDto>(items, totalCount, pageSize, pageNumber);

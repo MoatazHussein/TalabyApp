@@ -37,7 +37,7 @@ public class ProjectRequestRepository(TalabyDbContext dbContext)
         return await query.ToListAsync();
     }
 
-    public async Task<(IEnumerable<ProjectRequest>, int)> GetAllMatchingAsync(string? searchPhrase,
+    public async Task<(IEnumerable<ProjectRequest>, int)> GetAllMatchingAsync(int storeCategoryId, string? searchPhrase,
         int pageSize,
         int pageNumber,
         string? sortBy,
@@ -49,6 +49,11 @@ public class ProjectRequestRepository(TalabyDbContext dbContext)
             .ProjectRequests
             .Where(r => searchPhraseLower == null || (r.Title.ToLower().Contains(searchPhraseLower)
                                                    || r.Description.ToLower().Contains(searchPhraseLower)));
+
+        if (storeCategoryId > 0)
+        {
+            baseQuery = baseQuery.Where(r => r.StoreCategoryId == storeCategoryId);
+        }
 
         var totalCount = await baseQuery.CountAsync();
 

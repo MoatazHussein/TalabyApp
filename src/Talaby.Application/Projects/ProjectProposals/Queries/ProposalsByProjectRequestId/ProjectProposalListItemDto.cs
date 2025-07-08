@@ -7,5 +7,6 @@ public class ProjectProposalListItemDto
     public decimal ProposedAmount { get; set; }
     public DateTime CreatedAt { get; set; }
     public string CreatorEmail { get; set; } = default!;
+    public string CreatorCommercialRegisterNumber { get; set; } = default!;
     public int RepliesCount { get; set; }
 }
