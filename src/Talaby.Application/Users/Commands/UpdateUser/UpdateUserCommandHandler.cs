@@ -12,7 +12,7 @@ namespace Talaby.Application.Users.Commands.UpdateUser;
 public class UpdateUserCommandHandler(UserManager<AppUser> userManager, IStoreCategoryRepository storeCategoryRepository, IMapper mapper) : IRequestHandler<UpdateUserCommand, bool>
 {
     private readonly UserManager<AppUser> _userManager = userManager;
-    private readonly IStoreCategoryRepository _storeCategoryRepository;
+    private readonly IStoreCategoryRepository _storeCategoryRepository = storeCategoryRepository;
     private readonly IMapper _mapper = mapper;
 
     public async Task<bool> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
@@ -29,14 +29,14 @@ public class UpdateUserCommandHandler(UserManager<AppUser> userManager, IStoreCa
         if (user.UserType == UserType.Store)
         {
             var existingFirstName = await _userManager.Users
-                                    .AnyAsync(c => (c.FirstName == request.FirstName && c.UserType == UserType.Store), cancellationToken);
+                                    .AnyAsync(c => (c.FirstName == request.FirstName && c.Id != request.Id), cancellationToken);
 
             if (existingFirstName)
                 throw new AlreadyExistsException("First Name for Store");
 
 
             var existingCommercialRegisterNumber = await _userManager.Users
-                                                   .AnyAsync(c => c.CommercialRegisterNumber == request.CommercialRegisterNumber, cancellationToken);
+                                                   .AnyAsync(c => c.CommercialRegisterNumber == request.CommercialRegisterNumber && c.Id != request.Id, cancellationToken);
 
             if (existingCommercialRegisterNumber)
                 throw new AlreadyExistsException("Commercial Register Number for Store");

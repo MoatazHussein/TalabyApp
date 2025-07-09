@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Talaby.Application.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
+using Talaby.Application.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
 using Talaby.Application.Projects.ProjectRequests.Commands.CreateProjectRequest;
 using Talaby.Application.Projects.ProjectRequests.Commands.DeleteProjectRequest;
 using Talaby.Application.Projects.ProjectRequests.Commands.UpdateProjectRequest;
@@ -43,6 +44,14 @@ public class ProjectRequestsController (IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetProposals(Guid id, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         var result = await mediator.Send(new GetProposalsByProjectRequestIdQuery(id, page, pageSize));
+        return Ok(result);
+    }
+
+
+    [HttpGet("{id}/questions")]
+    public async Task<IActionResult> GetQuestions(Guid id, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    {
+        var result = await mediator.Send(new GetQuestionsByProjectRequestIdQuery(id, page, pageSize));
         return Ok(result);
     }
 

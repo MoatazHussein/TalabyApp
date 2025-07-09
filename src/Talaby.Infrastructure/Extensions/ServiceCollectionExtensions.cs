@@ -3,8 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
+using Talaby.Application.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
 using Talaby.Application.Projects.ProjectRequests.Queries.GetProjectRequestDetails;
 using Talaby.Application.Projects.ProposalReplies.Queries.RepliesByProposalId;
+using Talaby.Application.Projects.QuestionReplies.Queries.RepliesByQuestionId;
 using Talaby.Domain.Entities;
 using Talaby.Domain.Repositories;
 using Talaby.Domain.Repositories.Projects;
@@ -44,6 +46,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IProposalReplyReadRepository, ProposalReplyReadRepository>();
 
 
+        services.AddScoped<IProjectQuestionRepository, ProjectQuestionRepository>();
+        services.AddScoped<IQuestionReplyRepository, QuestionReplyRepository>();
+        services.AddScoped<IProjectQuestionReadRepository, ProjectQuestionReadRepository>();
+        services.AddScoped<IQuestionReplyReadRepository, QuestionReplyReadRepository>();
 
 
     }
