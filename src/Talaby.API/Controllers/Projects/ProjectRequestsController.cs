@@ -1,15 +1,15 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Talaby.Application.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
-using Talaby.Application.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
-using Talaby.Application.Projects.ProjectRequests.Commands.CreateProjectRequest;
-using Talaby.Application.Projects.ProjectRequests.Commands.DeleteProjectRequest;
-using Talaby.Application.Projects.ProjectRequests.Commands.UpdateProjectRequest;
-using Talaby.Application.Projects.ProjectRequests.Queries.Dtos;
-using Talaby.Application.Projects.ProjectRequests.Queries.GetAllProjectRequests;
-using Talaby.Application.Projects.ProjectRequests.Queries.GetProjectRequestById;
-using Talaby.Application.Projects.ProjectRequests.Queries.GetProjectRequestDetails;
+using Talaby.Application.Features.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
+using Talaby.Application.Features.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
+using Talaby.Application.Features.Projects.ProjectRequests.Commands.CreateProjectRequest;
+using Talaby.Application.Features.Projects.ProjectRequests.Commands.DeleteProjectRequest;
+using Talaby.Application.Features.Projects.ProjectRequests.Commands.UpdateProjectRequest;
+using Talaby.Application.Features.Projects.ProjectRequests.Queries.Dtos;
+using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetAllProjectRequests;
+using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetProjectRequestById;
+using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetProjectRequestDetails;
 
 namespace Talaby.API.Controllers.Projects;
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Talaby.Application.Common;
-using Talaby.Application.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
+using Talaby.Application.Features.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
 using Talaby.Infrastructure.Persistence;
 
 namespace Talaby.Infrastructure.Repositories.Projects;

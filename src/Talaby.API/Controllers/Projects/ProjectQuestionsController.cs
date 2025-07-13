@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Talaby.Application.Projects.ProjectQuestions.Commands.CreateProjectQuestion;
-using Talaby.Application.Projects.ProjectQuestions.Commands.DeleteProjectQuestion;
-using Talaby.Application.Projects.ProjectQuestions.Commands.UpdateProjectQuestion;
-using Talaby.Application.Projects.QuestionReplies.Queries.RepliesByQuestionId;
+using Talaby.Application.Features.Projects.ProjectQuestions.Commands.CreateProjectQuestion;
+using Talaby.Application.Features.Projects.ProjectQuestions.Commands.DeleteProjectQuestion;
+using Talaby.Application.Features.Projects.ProjectQuestions.Commands.UpdateProjectQuestion;
+using Talaby.Application.Features.Projects.QuestionReplies.Queries.RepliesByQuestionId;
 namespace Talaby.API.Controllers.Projects;
 
 [ApiController]

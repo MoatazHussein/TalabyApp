@@ -2,20 +2,22 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Talaby.Application.Common.Interfaces;
-using Talaby.Application.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
-using Talaby.Application.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
-using Talaby.Application.Projects.ProjectRequests.Queries.GetProjectRequestDetails;
-using Talaby.Application.Projects.ProposalReplies.Queries.RepliesByProposalId;
-using Talaby.Application.Projects.QuestionReplies.Queries.RepliesByQuestionId;
+using Talaby.Application.Features.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
+using Talaby.Application.Features.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
+using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetProjectRequestDetails;
+using Talaby.Application.Features.Projects.ProposalReplies.Queries.RepliesByProposalId;
+using Talaby.Application.Features.Projects.QuestionReplies.Queries.RepliesByQuestionId;
 using Talaby.Domain.Entities;
 using Talaby.Domain.Repositories;
 using Talaby.Domain.Repositories.Projects;
-using Talaby.Infrastructure.Email;
-using Talaby.Infrastructure.Identity;
 using Talaby.Infrastructure.Persistence;
 using Talaby.Infrastructure.Repositories;
 using Talaby.Infrastructure.Repositories.Projects;
 using Talaby.Infrastructure.Seeders;
+using Talaby.Infrastructure.Services.DataVisibilityPolicy;
+using Talaby.Infrastructure.Services.Email;
+using Talaby.Infrastructure.Services.Identity;
+using Talaby.Infrastructure.Services.TimeZone;
 
 namespace Talaby.Infrastructure.Extensions;
 public static class ServiceCollectionExtensions
@@ -50,6 +52,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQuestionReplyRepository, QuestionReplyRepository>();
         services.AddScoped<IProjectQuestionReadRepository, ProjectQuestionReadRepository>();
         services.AddScoped<IQuestionReplyReadRepository, QuestionReplyReadRepository>();
+
+
+        services.AddScoped<ICommercialRegisterNumberMasker, CommercialRegisterNumberMasker>();
+        services.AddScoped<ITimeZoneConversionService, TimeZoneConversionService>();
+
 
 
     }

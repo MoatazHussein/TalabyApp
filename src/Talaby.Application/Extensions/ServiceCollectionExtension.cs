@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
-using Talaby.Application.Users;
+using Talaby.Application.Features.Users;
 
 namespace Talaby.Application.Extensions;
 

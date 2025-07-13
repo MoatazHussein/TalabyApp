@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Talaby.Application.Projects.ProjectQuestions.Commands.UpdateProjectQuestion;
+using Talaby.Application.Features.Projects.ProjectQuestions.Commands.UpdateProjectQuestion;
 using Talaby.Domain.Entities.Projects;
 
 namespace Talaby.Application.Common.Mappings;

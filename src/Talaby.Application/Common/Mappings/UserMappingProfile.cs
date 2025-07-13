@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Talaby.Application.Users.Dtos;
+using Talaby.Application.Features.Users.Dtos;
 using Talaby.Domain.Entities;
 
 namespace Talaby.Application.Common.Mappings;

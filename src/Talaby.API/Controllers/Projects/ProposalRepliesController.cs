@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Talaby.Application.Projects.ProposalReplies.Commands.CreateProposalReply;
-using Talaby.Application.Projects.ProposalReplies.Commands.DeleteProposalReply;
-using Talaby.Application.Projects.ProposalReplies.Commands.UpdateProposalReply;
+using Talaby.Application.Features.Projects.ProposalReplies.Commands.CreateProposalReply;
+using Talaby.Application.Features.Projects.ProposalReplies.Commands.DeleteProposalReply;
+using Talaby.Application.Features.Projects.ProposalReplies.Commands.UpdateProposalReply;
 namespace Talaby.API.Controllers.Projects;
 
 [ApiController]

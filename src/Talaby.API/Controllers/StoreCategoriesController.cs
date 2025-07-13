@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Talaby.Application.StoreCategories.Commands.CreateStoreCategory;
-using Talaby.Application.StoreCategories.Commands.DeleteStoreCategory;
-using Talaby.Application.StoreCategories.Commands.UpdateStoreCategory;
-using Talaby.Application.StoreCategories.Queries.GetAllStoreCategories;
-using Talaby.Application.StoreCategories.Queries.GetStoreCategoryById;
+using Talaby.Application.Features.StoreCategories.Commands.CreateStoreCategory;
+using Talaby.Application.Features.StoreCategories.Commands.DeleteStoreCategory;
+using Talaby.Application.Features.StoreCategories.Commands.UpdateStoreCategory;
+using Talaby.Application.Features.StoreCategories.Queries.GetAllStoreCategories;
+using Talaby.Application.Features.StoreCategories.Queries.GetStoreCategoryById;
 using Talaby.Domain.Entities;
 
 namespace Talaby.API.Controllers

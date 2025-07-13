@@ -1,19 +1,33 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Talaby.Application.Common;
-using Talaby.Application.Projects.Dtos;
-using Talaby.Application.Projects.ProposalReplies.Queries.RepliesByProposalId;
+using Talaby.Application.Features.Projects.Dtos;
+using Talaby.Application.Features.Projects.ProposalReplies.Queries.RepliesByProposalId;
+using Talaby.Domain.Entities.Projects;
+using Talaby.Domain.Exceptions;
 using Talaby.Infrastructure.Persistence;
 
 namespace Talaby.Infrastructure.Repositories.Projects;
 
 public class ProposalReplyReadRepository(TalabyDbContext context) : IProposalReplyReadRepository
 {
-    public async Task<PagedResult<ProposalReplyDto>> GetPagedRepliesAsync(
-        Guid proposalId,
-        int pageNumber,
-        int pageSize,
-        CancellationToken cancellationToken)
+    public async Task<ProposalWithRepliesDto> GetProposalWithRepliesAsync(
+  Guid proposalId,
+  int pageNumber,
+  int pageSize,
+  CancellationToken cancellationToken)
     {
+        var proposal = await context.ProjectProposals
+            .Where(q => q.Id == proposalId)
+            .Select(q => new
+            {
+                q.Id,
+                q.Content,
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+         if (proposal == null)
+         throw new NotFoundException(nameof(ProjectProposal), proposalId.ToString());
+
         var query = context.ProposalReplies
             .Where(r => r.ProjectProposalId == proposalId)
             .OrderBy(r => r.CreatedAt);
@@ -33,6 +47,12 @@ public class ProposalReplyReadRepository(TalabyDbContext context) : IProposalRep
             })
             .ToListAsync(cancellationToken);
 
-        return new PagedResult<ProposalReplyDto>(items, totalCount, pageSize, pageNumber);
+        return new ProposalWithRepliesDto
+        {
+            ProposalId = proposal.Id,
+            ProposalContent = proposal.Content,
+            Replies = new PagedResult<ProposalReplyDto>(items, totalCount, pageSize, pageNumber)
+        };
+
     }
 }

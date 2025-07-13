@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Talaby.Application.Projects.ProjectRequests.Commands.UpdateProjectRequest;
-using Talaby.Application.Projects.ProjectRequests.Queries.Dtos;
+using Talaby.Application.Features.Projects.ProjectRequests.Commands.UpdateProjectRequest;
+using Talaby.Application.Features.Projects.ProjectRequests.Queries.Dtos;
 using Talaby.Domain.Entities.Projects;
 
 namespace Talaby.Application.Common.Mappings;

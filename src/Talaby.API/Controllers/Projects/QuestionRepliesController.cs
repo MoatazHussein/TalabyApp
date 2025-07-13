@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Talaby.Application.Projects.QuestionReplies.Commands.CreateQuestionReply;
-using Talaby.Application.Projects.QuestionReplies.Commands.DeleteQuestionReply;
-using Talaby.Application.Projects.QuestionReplies.Commands.UpdateQuestionReply;
+using Talaby.Application.Features.Projects.QuestionReplies.Commands.CreateQuestionReply;
+using Talaby.Application.Features.Projects.QuestionReplies.Commands.DeleteQuestionReply;
+using Talaby.Application.Features.Projects.QuestionReplies.Commands.UpdateQuestionReply;
 namespace Talaby.API.Controllers.Projects;
 
 [ApiController]

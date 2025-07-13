@@ -1,19 +1,34 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Talaby.Application.Common;
-using Talaby.Application.Projects.Dtos;
-using Talaby.Application.Projects.QuestionReplies.Queries.RepliesByQuestionId;
+using Talaby.Application.Features.Projects.Dtos;
+using Talaby.Application.Features.Projects.QuestionReplies.Queries.RepliesByQuestionId;
+using Talaby.Domain.Entities.Projects;
+using Talaby.Domain.Exceptions;
 using Talaby.Infrastructure.Persistence;
 
 namespace Talaby.Infrastructure.Repositories.Projects;
 
 public class QuestionReplyReadRepository(TalabyDbContext context) : IQuestionReplyReadRepository
 {
-    public async Task<PagedResult<QuestionReplyDto>> GetPagedRepliesAsync(
-        Guid questionId,
-        int pageNumber,
-        int pageSize,
-        CancellationToken cancellationToken)
+    public async Task<QuestionWithRepliesDto> GetQuestionWithRepliesAsync(
+    Guid questionId,
+    int pageNumber,
+    int pageSize,
+    CancellationToken cancellationToken)
     {
+        var question = await context.ProjectQuestions
+            .Where(q => q.Id == questionId)
+            .Select(q => new
+            {
+                q.Id,
+                q.Content,
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (question == null)
+        throw new NotFoundException(nameof(ProjectQuestion), questionId.ToString());
+
+
         var query = context.QuestionReplies
             .Where(r => r.ProjectQuestionId == questionId)
             .OrderBy(r => r.CreatedAt);
@@ -33,6 +48,12 @@ public class QuestionReplyReadRepository(TalabyDbContext context) : IQuestionRep
             })
             .ToListAsync(cancellationToken);
 
-        return new PagedResult<QuestionReplyDto>(items, totalCount, pageSize, pageNumber);
+        return new QuestionWithRepliesDto
+        {
+            QuestionId = question.Id,
+            QuestionContent = question.Content,
+            Replies = new PagedResult<QuestionReplyDto>(items, totalCount, pageSize, pageNumber)
+        };
+
     }
 }

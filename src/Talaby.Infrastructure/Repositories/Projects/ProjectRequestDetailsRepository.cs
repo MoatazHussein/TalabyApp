@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Talaby.Application.Projects.Dtos;
-using Talaby.Application.Projects.ProjectRequests.Queries.GetProjectRequestDetails;
+using Talaby.Application.Features.Projects.Dtos;
+using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetProjectRequestDetails;
 using Talaby.Infrastructure.Persistence;
 
 namespace Talaby.Infrastructure.Repositories.Projects;
