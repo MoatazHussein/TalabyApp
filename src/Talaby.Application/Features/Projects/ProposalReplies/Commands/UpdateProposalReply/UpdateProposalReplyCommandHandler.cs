@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Features.Users;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Exceptions;
 using Talaby.Domain.Repositories.Projects;
 
 namespace Talaby.Application.Features.Projects.ProposalReplies.Commands.UpdateProposalReply;
 
-public class UpdateProposalReplyCommandHandler(ILogger<UpdateProposalReplyCommandHandler> logger,
+public class UpdateProposalReplyCommandHandler(ILogger<UpdateProposalReplyCommandHandler> logger, IUserContext userContext,
     IProposalReplyRepository proposalReplyRepository, IMapper mapper) : IRequestHandler<UpdateProposalReplyCommand>
 {
     public async Task Handle(UpdateProposalReplyCommand request, CancellationToken cancellationToken)
@@ -17,12 +18,11 @@ public class UpdateProposalReplyCommandHandler(ILogger<UpdateProposalReplyComman
         if (proposalReply is null)
             throw new NotFoundException(nameof(ProposalReply), request.Id.ToString());
 
-        var existingProposalReply = await proposalReplyRepository.AnyAsync( p => p.Id == request.Id  , cancellationToken);
+        var currentUser = userContext.GetCurrentUser()
+                         ?? throw new UnAuthorizedAccessException("User not authenticated.");
 
-        if (!existingProposalReply)
-        {
-            throw new NotFoundException(nameof(ProposalReply), request.Id.ToString());
-        }
+        if (proposalReply.CreatorId != currentUser.Id)
+            throw new BusinessRuleException("You are not allowed to Update this Reply.", 403);
 
         mapper.Map(request, proposalReply);
 

@@ -1,13 +1,15 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Features.Users;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Exceptions;
 using Talaby.Domain.Repositories.Projects;
 
 namespace Talaby.Application.Features.Projects.ProjectQuestions.Commands.UpdateProjectQuestion;
 
-public class UpdateProjectQuestionCommandHandler(ILogger<UpdateProjectQuestionCommandHandler> logger,
+public class UpdateProjectQuestionCommandHandler(ILogger<UpdateProjectQuestionCommandHandler> logger,IUserContext userContext,
     IProjectQuestionRepository projectQuestionRepository, IMapper mapper) : IRequestHandler<UpdateProjectQuestionCommand>
 {
     public async Task Handle(UpdateProjectQuestionCommand request, CancellationToken cancellationToken)
@@ -17,12 +19,11 @@ public class UpdateProjectQuestionCommandHandler(ILogger<UpdateProjectQuestionCo
         if (projectQuestion is null)
             throw new NotFoundException(nameof(projectQuestion), request.Id.ToString());
 
-        var existingProjectQuestion = await projectQuestionRepository.AnyAsync( p => p.Id == request.Id  , cancellationToken);
+        var currentUser = userContext.GetCurrentUser()
+               ?? throw new UnAuthorizedAccessException("User not authenticated.");
 
-        if (!existingProjectQuestion)
-        {
-            throw new NotFoundException(nameof(ProjectQuestion), request.Id.ToString());
-        }
+        if (projectQuestion.CreatorId != currentUser.Id)
+            throw new BusinessRuleException("You are not allowed to update this Question.", 403);
 
         mapper.Map(request, projectQuestion);
 

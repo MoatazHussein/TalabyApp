@@ -1,4 +1,6 @@
-﻿namespace Talaby.Domain.Entities.Projects;
+﻿using Talaby.Domain.Enums;
+
+namespace Talaby.Domain.Entities.Projects;
 
 public class ProjectProposal
 {
@@ -12,6 +14,8 @@ public class ProjectProposal
     public decimal ProposedAmount { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public ProjectProposalStatus Status { get; set; } = ProjectProposalStatus.Pending;
+
 
     public ICollection<ProposalReply> Replies { get; set; } = new List<ProposalReply>();
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Talaby.Application.Features.Projects.ProjectProposals.Commands.CreateProjectProposal;
 using Talaby.Application.Features.Projects.ProjectProposals.Commands.DeleteProjectProposal;
 using Talaby.Application.Features.Projects.ProjectProposals.Commands.UpdateProjectProposal;
+using Talaby.Application.Features.Projects.ProjectProposals.Commands.UpdateProjectProposalStatus;
 using Talaby.Application.Features.Projects.ProposalReplies.Queries.RepliesByProposalId;
 namespace Talaby.API.Controllers.Projects;
 
@@ -27,6 +28,13 @@ public class ProjectProposalsController(IMediator mediator) : ControllerBase
         return StatusCode(200, $"Updated successfully");
     }
 
+    [HttpPatch("status")]
+    public async Task<IActionResult> UpdateProjectProposalStatus(UpdateProjectProposalStatusCommand command)
+    {
+        await mediator.Send(command);
+
+        return StatusCode(200, $"Updated successfully");
+    }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProjectProposal([FromRoute] Guid id)

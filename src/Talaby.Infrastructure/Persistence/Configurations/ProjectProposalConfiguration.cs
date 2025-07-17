@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Talaby.Domain.Entities.Projects;
+using Talaby.Domain.Enums;
 
 namespace Talaby.Infrastructure.Persistence.Configurations;
 
@@ -30,6 +31,9 @@ public class ProjectProposalConfiguration : IEntityTypeConfiguration<ProjectProp
                .WithMany(r => r.Proposals)
                //.WithMany()
                .HasForeignKey(p => p.ProjectRequestId)
-               .OnDelete(DeleteBehavior.Cascade); 
+               .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Property(p => p.Status)
+         .HasDefaultValue(ProjectProposalStatus.Pending);
     }
 }

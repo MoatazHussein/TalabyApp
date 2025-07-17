@@ -17,7 +17,8 @@ using Talaby.Infrastructure.Seeders;
 using Talaby.Infrastructure.Services.DataVisibilityPolicy;
 using Talaby.Infrastructure.Services.Email;
 using Talaby.Infrastructure.Services.Identity;
-using Talaby.Infrastructure.Services.TimeZone;
+using Talaby.Infrastructure.Services.TimeConversion;
+using Talaby.Infrastructure.Services.UnitOfWork;
 
 namespace Talaby.Infrastructure.Extensions;
 public static class ServiceCollectionExtensions
@@ -55,9 +56,8 @@ public static class ServiceCollectionExtensions
 
 
         services.AddScoped<ICommercialRegisterNumberMasker, CommercialRegisterNumberMasker>();
-        services.AddScoped<ITimeZoneConversionService, TimeZoneConversionService>();
-
-
+        services.AddScoped<ITimeZoneConverter, TimeZoneConverter>();
+        services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
     }
 

@@ -6,6 +6,7 @@ using Talaby.Application.Features.Projects.ProjectQuestions.Queries.QuestionsByP
 using Talaby.Application.Features.Projects.ProjectRequests.Commands.CreateProjectRequest;
 using Talaby.Application.Features.Projects.ProjectRequests.Commands.DeleteProjectRequest;
 using Talaby.Application.Features.Projects.ProjectRequests.Commands.UpdateProjectRequest;
+using Talaby.Application.Features.Projects.ProjectRequests.Commands.UpdateProjectRequestStatus;
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.Dtos;
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetAllProjectRequests;
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetProjectRequestById;
@@ -66,6 +67,14 @@ public class ProjectRequestsController (IMediator mediator) : ControllerBase
 
     [HttpPatch()]
     public async Task<IActionResult> UpdateProjectRequest(UpdateProjectRequestCommand command)
+    {
+        await mediator.Send(command);
+
+        return StatusCode(200, $"Updated successfully");
+    }
+
+    [HttpPatch("status")]
+    public async Task<IActionResult> UpdateProjectRequestStatus(UpdateProjectRequestStatusCommand command)
     {
         await mediator.Send(command);
 

@@ -2,11 +2,11 @@
 using Talaby.Application.Common;
 using Talaby.Application.Common.Interfaces;
 
-namespace Talaby.Infrastructure.Services.TimeZone;
+namespace Talaby.Infrastructure.Services.TimeConversion;
 
-public class TimeZoneConversionService : ITimeZoneConversionService
+public class TimeZoneConverter : ITimeZoneConverter
 {
-    private const string DefaultTimeZoneId = "Arab Standard Time";
+    public const string DefaultTimeZoneId = "Arab Standard Time";
 
     public T ConvertUtcToLocal<T>(T dto, string? timeZoneId)
     {
@@ -66,4 +66,5 @@ public class TimeZoneConversionService : ITimeZoneConversionService
             return TimeZoneInfo.FindSystemTimeZoneById(DefaultTimeZoneId);
         }
     }
+
 }

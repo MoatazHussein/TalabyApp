@@ -17,15 +17,23 @@ public class ProposalReplyReadRepository(TalabyDbContext context) : IProposalRep
   CancellationToken cancellationToken)
     {
         var proposal = await context.ProjectProposals
+            .Include(q => q.Creator)
+            .Include(q => q.ProjectRequest)
+              .ThenInclude(r => r.Creator) 
             .Where(q => q.Id == proposalId)
             .Select(q => new
             {
-                q.Id,
-                q.Content,
+                Id= q.Id,
+                ProposalCreatorId = q.Creator.Id,
+                ProjectRequestId = q.ProjectRequest.Id,
+                ProjectRequestCreatorId = q.ProjectRequest.Creator.Id,
+                ProjectRequestCreatorEmail = q.ProjectRequest.Creator.Email,
+                Content = q.Content,
+                Status = q.Status,
             })
             .FirstOrDefaultAsync(cancellationToken);
 
-         if (proposal == null)
+        if (proposal == null)
          throw new NotFoundException(nameof(ProjectProposal), proposalId.ToString());
 
         var query = context.ProposalReplies
@@ -50,7 +58,13 @@ public class ProposalReplyReadRepository(TalabyDbContext context) : IProposalRep
         return new ProposalWithRepliesDto
         {
             ProposalId = proposal.Id,
+            ProposalCreatorId = proposal.ProposalCreatorId,
+            ProjectRequestId = proposal.ProjectRequestId,
+            ProjectRequestCreatorId = proposal.ProjectRequestCreatorId,
+            ProjectRequestCreatorEmail = proposal.ProjectRequestCreatorEmail,
             ProposalContent = proposal.Content,
+            ProposalStatusValue = (int) proposal.Status,
+            ProposalStatusName = proposal.Status.ToString(),
             Replies = new PagedResult<ProposalReplyDto>(items, totalCount, pageSize, pageNumber)
         };
 

@@ -28,8 +28,10 @@ public class ProjectProposalReadRepository(TalabyDbContext context) : IProjectPr
                 Content = p.Content,
                 ProposedAmount = p.ProposedAmount,
                 CreatedAt = p.CreatedAt,
+                StatusValue = (int)p.Status,
+                StatusName = p.Status.ToString(),
                 CreatorEmail = p.Creator.Email,
-                CreatorCommercialRegisterNumber = p.Creator.CommercialRegisterNumber,
+                CreatorCommercialRegisterNumber = p.Creator.CommercialRegisterNumber!,
                 RepliesCount = p.Replies.Count
             })
             .OrderBy(p => p.ProposedAmount).ThenBy(p => p.CreatedAt)

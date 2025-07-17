@@ -1,10 +1,13 @@
 ﻿using MediatR;
+using Talaby.Application.Common.Interfaces;
+using Talaby.Application.Features.Projects.ProjectRequests.Queries.Dtos;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Exceptions;
 
 namespace Talaby.Application.Features.Projects.ProjectRequests.Queries.GetProjectRequestDetails;
 
-public class GetProjectRequestDetailsHandler(IProjectRequestDetailsRepository repository) : IRequestHandler<GetProjectRequestDetailsQuery, ProjectRequestDetailsDto>
+public class GetProjectRequestDetailsHandler(IProjectRequestDetailsRepository repository,
+    ITimeZoneConverter timeZoneService) : IRequestHandler<GetProjectRequestDetailsQuery, ProjectRequestDetailsDto>
 {
     public async Task<ProjectRequestDetailsDto> Handle(GetProjectRequestDetailsQuery request, CancellationToken cancellationToken)
     {

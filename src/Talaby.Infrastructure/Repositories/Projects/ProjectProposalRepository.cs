@@ -1,5 +1,7 @@
 ﻿using System.Linq.Expressions;
+using System.Threading;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Repositories.Projects;
 using Talaby.Infrastructure.Persistence;
@@ -21,6 +23,12 @@ public class ProjectProposalRepository(TalabyDbContext dbContext)
         return await query.FirstOrDefaultAsync(e => e.Id == id);
 
     }
+    public async Task<IEnumerable<ProjectProposal>> GetAllAsync(Expression<Func<ProjectProposal, bool>> predicate, CancellationToken cancellationToken)
+    {
+      return await dbContext.ProjectProposals
+            .Where(predicate)
+            .ToListAsync(cancellationToken);   
+    }
 
     public async Task<bool> AnyAsync(Expression<Func<ProjectProposal, bool>> predicate, CancellationToken cancellationToken)
     {
@@ -40,4 +48,15 @@ public class ProjectProposalRepository(TalabyDbContext dbContext)
     }
 
     public Task SaveChanges() => dbContext.SaveChangesAsync();
+
+    public async Task BulkUpdateAsync(
+    Expression<Func<ProjectProposal, bool>> predicate,
+    Expression<Func<SetPropertyCalls<ProjectProposal>, SetPropertyCalls<ProjectProposal>>> updateExpression,
+    CancellationToken cancellationToken)
+    {
+        await dbContext.ProjectProposals
+            .Where(predicate)
+            .ExecuteUpdateAsync(updateExpression, cancellationToken);
+    }
+
 }

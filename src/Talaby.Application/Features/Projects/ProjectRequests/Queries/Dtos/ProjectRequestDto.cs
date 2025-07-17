@@ -11,6 +11,8 @@ public class ProjectRequestDto
     public int StoreCategoryId { get; set; }
     public Guid CreatorId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public int StatusValue { get; set; }
+    public string StatusName { get; set; } = default!;
 
 }
 

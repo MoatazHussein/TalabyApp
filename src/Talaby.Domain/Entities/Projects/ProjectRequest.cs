@@ -1,4 +1,6 @@
-﻿namespace Talaby.Domain.Entities.Projects;
+﻿using Talaby.Domain.Enums;
+
+namespace Talaby.Domain.Entities.Projects;
 
 public class ProjectRequest
 {
@@ -15,6 +17,7 @@ public class ProjectRequest
     public AppUser? Creator { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public ProjectRequestStatus Status { get; set; } = ProjectRequestStatus.Open;
 
     public ICollection<ProjectProposal> Proposals { get; set; } = new List<ProjectProposal>();
     public ICollection<ProjectQuestion> Questions { get; set; } = new List<ProjectQuestion>();

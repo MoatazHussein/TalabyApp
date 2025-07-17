@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.Dtos;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Exceptions;
@@ -9,7 +10,7 @@ using Talaby.Domain.Repositories.Projects;
 namespace Talaby.Application.Features.Projects.ProjectRequests.Queries.GetProjectRequestById;
 
 public class GetProjectRequestByIdQueryHandler(IProjectRequestRepository projectRequestRepository, 
-    ILogger<GetProjectRequestByIdQueryHandler> logger, IMapper mapper) : IRequestHandler<GetProjectRequestByIdQuery, ProjectRequestDto>
+    ILogger<GetProjectRequestByIdQueryHandler> logger, IMapper mapper, ITimeZoneConverter timeZoneService) : IRequestHandler<GetProjectRequestByIdQuery, ProjectRequestDto>
 {
     public async Task<ProjectRequestDto?> Handle(GetProjectRequestByIdQuery request, CancellationToken cancellationToken)
     {
@@ -24,6 +25,8 @@ public class GetProjectRequestByIdQueryHandler(IProjectRequestRepository project
 
         var projectRequestDto = mapper.Map<ProjectRequestDto>(existingProjectRequest);
 
+        //return timeZoneService.ConvertUtcToLocal(projectRequestDto);
         return projectRequestDto;
+
     }
 }

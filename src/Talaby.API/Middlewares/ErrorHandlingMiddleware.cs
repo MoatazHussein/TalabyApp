@@ -23,11 +23,6 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
             context.Response.StatusCode = 401;
             await context.Response.WriteAsync(unAuthorizedAccess.Message);
         }
-        catch (ForbidException)
-        {
-            context.Response.StatusCode = 403;
-            await context.Response.WriteAsync("Access forbidden");
-        }
         catch (AlreadyExistsException alreadyExists)
         {
             context.Response.StatusCode = 409;
@@ -45,6 +40,7 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
         }
         catch (BusinessRuleException ex) 
         {
+            context.Response.StatusCode = ex.StatusCode;
             await context.Response.WriteAsync(ex.Message);
         }
         catch (Exception ex)

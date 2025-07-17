@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Features.Users;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Exceptions;
 using Talaby.Domain.Repositories.Projects;
 
 namespace Talaby.Application.Features.Projects.QuestionReplies.Commands.UpdateQuestionReply;
 
-public class UpdateQuestionReplyCommandHandler(ILogger<UpdateQuestionReplyCommandHandler> logger,
+public class UpdateQuestionReplyCommandHandler(ILogger<UpdateQuestionReplyCommandHandler> logger,IUserContext userContext,
     IQuestionReplyRepository questionReplyRepository, IMapper mapper) : IRequestHandler<UpdateQuestionReplyCommand>
 {
     public async Task Handle(UpdateQuestionReplyCommand request, CancellationToken cancellationToken)
@@ -17,12 +18,13 @@ public class UpdateQuestionReplyCommandHandler(ILogger<UpdateQuestionReplyComman
         if (questionReply is null)
             throw new NotFoundException(nameof(QuestionReply), request.Id.ToString());
 
-        var existingQuestionReply = await questionReplyRepository.AnyAsync( p => p.Id == request.Id  , cancellationToken);
 
-        if (!existingQuestionReply)
-        {
-            throw new NotFoundException(nameof(QuestionReply), request.Id.ToString());
-        }
+        var currentUser = userContext.GetCurrentUser()
+                ?? throw new UnAuthorizedAccessException("User not authenticated.");
+
+        if (questionReply.CreatorId != currentUser.Id)
+            throw new BusinessRuleException("You are not allowed to update this Reply.", 403);
+
 
         mapper.Map(request, questionReply);
 

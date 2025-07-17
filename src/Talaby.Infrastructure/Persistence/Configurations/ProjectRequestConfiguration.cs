@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Talaby.Domain.Entities.Projects;
+using Talaby.Domain.Enums;
 
 namespace Talaby.Infrastructure.Persistence.Configurations;
 public class ProjectRequestConfiguration : IEntityTypeConfiguration<ProjectRequest>
@@ -32,6 +33,9 @@ public class ProjectRequestConfiguration : IEntityTypeConfiguration<ProjectReque
         builder.HasOne(p => p.Creator)
                .WithMany()
                .HasForeignKey(p => p.CreatorId);
+
+        builder.Property(p => p.Status)
+        .HasDefaultValue(ProjectRequestStatus.Open);
     }
 }
 

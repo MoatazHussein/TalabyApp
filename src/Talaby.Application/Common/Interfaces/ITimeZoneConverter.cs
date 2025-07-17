@@ -1,6 +1,6 @@
 ﻿namespace Talaby.Application.Common.Interfaces;
 
-public interface ITimeZoneConversionService
+public interface ITimeZoneConverter
 {
     T ConvertUtcToLocal<T>(T dto, string? timeZoneId = null);
     List<T> ConvertListUtcToLocal<T>(List<T> list, string? timeZoneId = null);
