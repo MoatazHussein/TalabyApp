@@ -4,7 +4,8 @@ using Talaby.Application.Features.Projects.Dtos;
 
 namespace Talaby.Application.Features.Projects.ProposalReplies.Queries.RepliesByProposalId;
 
-public class GetRepliesByProposalIdHandler(IProposalReplyReadRepository repository, ICommercialRegisterNumberMasker mask)
+public class GetRepliesByProposalIdHandler(IProposalReplyReadRepository repository, ICommercialRegisterNumberMasker mask,
+    ITimeZoneConverter timeZoneService)
         : IRequestHandler<GetRepliesByProposalIdQuery, ProposalWithRepliesDto>
 {
     public async Task<ProposalWithRepliesDto> Handle(
@@ -23,6 +24,6 @@ public class GetRepliesByProposalIdHandler(IProposalReplyReadRepository reposito
                 mask.Mask(reply.CreatorCommercialRegisterNumber);
         }
 
-        return result;
+        return timeZoneService.ConvertUtcToLocal(result);
     }
 }

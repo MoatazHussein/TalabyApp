@@ -10,7 +10,6 @@ using Talaby.Application.Features.Projects.ProjectRequests.Commands.UpdateProjec
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.Dtos;
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetAllProjectRequests;
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetProjectRequestById;
-using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetProjectRequestDetails;
 
 namespace Talaby.API.Controllers.Projects;
 
@@ -32,13 +31,6 @@ public class ProjectRequestsController (IMediator mediator) : ControllerBase
     {
         var projectRequest = await mediator.Send(new GetProjectRequestByIdQuery(id));
         return Ok(projectRequest);
-    }
-
-    [HttpGet("{id}/details")]
-    public async Task<IActionResult> GetDetails(Guid id)
-    {
-        var result = await mediator.Send(new GetProjectRequestDetailsQuery(id));
-        return Ok(result);
     }
 
     [HttpGet("{id}/proposals")]

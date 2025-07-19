@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Domain.Entities;
 using Talaby.Domain.Exceptions;
 using Talaby.Domain.Repositories;
@@ -8,7 +9,7 @@ using Talaby.Domain.Repositories;
 namespace Talaby.Application.Features.StoreCategories.Queries.GetStoreCategoryById;
 
 public class GetStoreCategoryByIdQueryHandler(IStoreCategoryRepository StoreCategoriesRepository, 
-    ILogger<GetStoreCategoryByIdQueryHandler> logger, IMapper mapper) : IRequestHandler<GetStoreCategoryByIdQuery, StoreCategory>
+    ILogger<GetStoreCategoryByIdQueryHandler> logger, IMapper mapper, ITimeZoneConverter timeZoneConverter) : IRequestHandler<GetStoreCategoryByIdQuery, StoreCategory>
 {
     public async Task<StoreCategory?> Handle(GetStoreCategoryByIdQuery request, CancellationToken cancellationToken)
     {
@@ -19,6 +20,6 @@ public class GetStoreCategoryByIdQueryHandler(IStoreCategoryRepository StoreCate
 
         var storeCategoryDto = mapper.Map<StoreCategory>(storeCategory);
 
-        return storeCategoryDto;
+        return timeZoneConverter.ConvertUtcToLocal(storeCategoryDto);
     }
 }

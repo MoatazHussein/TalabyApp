@@ -11,7 +11,7 @@ namespace Talaby.Application.Features.Projects.ProjectRequests.Queries.GetAllPro
 public class GetAllProjectRequestsQueryHandler(ILogger<GetAllProjectRequestsQuery> logger,
     IMapper mapper,
     IProjectRequestRepository ProjectRequestRepository,
-    ITimeZoneConverter timeZoneService)
+    ITimeZoneConverter timeZoneConverter)
     : IRequestHandler<GetAllProjectRequestsQuery, PagedResult<ProjectRequestDto>>
 {
     public async Task<PagedResult<ProjectRequestDto>> Handle(GetAllProjectRequestsQuery request, CancellationToken cancellationToken)
@@ -27,11 +27,7 @@ public class GetAllProjectRequestsQueryHandler(ILogger<GetAllProjectRequestsQuer
 
         var result = new PagedResult<ProjectRequestDto>(projectRequestDtos, totalCount, request.PageSize, request.PageNumber);
 
-        return result;
-        //return _timeZoneService.ConvertPagedUtcToLocal(result, request.TimeZoneId);
-        //return timeZoneService.ConvertPagedUtcToLocal(result);
-
+        //return result;
+        return timeZoneConverter.ConvertUtcToLocal(result);
     }
-
- 
 }

@@ -1,70 +1,85 @@
-﻿using System.Reflection;
-using Talaby.Application.Common;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Talaby.Application.Common.Interfaces;
 
 namespace Talaby.Infrastructure.Services.TimeConversion;
 
 public class TimeZoneConverter : ITimeZoneConverter
 {
-    public const string DefaultTimeZoneId = "Arab Standard Time";
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly string _defaultTimeZone;
+    private readonly ConcurrentDictionary<Type, PropertyInfo[]> _propertyCache = new();
 
-    public T ConvertUtcToLocal<T>(T dto, string? timeZoneId)
+    public TimeZoneConverter(IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+    {
+        _httpContextAccessor = httpContextAccessor;
+        _defaultTimeZone = configuration["AppSettings:DefaultTimeZone"] ?? "Arab Standard Time";
+    }
+
+    public T ConvertUtcToLocal<T>(T dto)
     {
         if (dto == null) return default!;
-
-        var timeZone = GetSafeTimeZone(timeZoneId);
-
-        var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-        foreach (var prop in props)
-        {
-            if (prop.PropertyType == typeof(DateTime))
-            {
-                var utc = (DateTime)prop.GetValue(dto)!;
-                if (utc.Kind != DateTimeKind.Utc)
-                    utc = DateTime.SpecifyKind(utc, DateTimeKind.Utc);
-
-                prop.SetValue(dto, TimeZoneInfo.ConvertTimeFromUtc(utc, timeZone));
-            }
-            else if (prop.PropertyType == typeof(DateTime?))
-            {
-                var utcNullable = (DateTime?)prop.GetValue(dto);
-                if (utcNullable.HasValue)
-                {
-                    var utc = DateTime.SpecifyKind(utcNullable.Value, DateTimeKind.Utc);
-                    prop.SetValue(dto, TimeZoneInfo.ConvertTimeFromUtc(utc, timeZone));
-                }
-            }
-        }
-
+        ConvertObject(dto!, GetTimeZoneId());
         return dto;
     }
 
-    public List<T> ConvertListUtcToLocal<T>(List<T> list, string? timeZoneId)
+    private void ConvertObject(object obj, string timeZoneId)
     {
-        return list.Select(item => ConvertUtcToLocal(item, timeZoneId)).ToList();
-    }
+        var type = obj.GetType();
 
-    public PagedResult<T> ConvertPagedUtcToLocal<T>(PagedResult<T> paged, string? timeZoneId)
-    {
-        paged.Items = ConvertListUtcToLocal(paged.Items.ToList(), timeZoneId);
-        return paged;
-    }
-
-    private TimeZoneInfo GetSafeTimeZone(string? timeZoneId)
-    {
-        try
+        if (obj is IEnumerable<object> enumerable)
         {
-            if (string.IsNullOrWhiteSpace(timeZoneId))
-                return TimeZoneInfo.FindSystemTimeZoneById(DefaultTimeZoneId);
-
-            return TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            foreach (var item in enumerable)
+                ConvertObject(item, timeZoneId);
+            return;
         }
-        catch
+
+        var props = _propertyCache.GetOrAdd(type, t =>
+            t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+             .Where(p => p.CanRead && p.CanWrite)
+             .ToArray());
+
+        foreach (var prop in props)
         {
-            // If invalid timezone ID passed
-            return TimeZoneInfo.FindSystemTimeZoneById(DefaultTimeZoneId);
+            var value = prop.GetValue(obj);
+            if (value == null) continue;
+
+            if (prop.PropertyType == typeof(DateTime) || prop.PropertyType == typeof(DateTime?))
+            {
+                var date = (DateTime?)value;
+                if (date.HasValue)
+                    prop.SetValue(obj, ConvertUtcToLocalDate(date.Value, timeZoneId));
+            }
+            else if (!prop.PropertyType.IsPrimitive && prop.PropertyType != typeof(string))
+            {
+                ConvertObject(value, timeZoneId);
+            }
         }
     }
+    private DateTime ConvertUtcToLocalDate(DateTime utcDate, string timeZoneId)
+    {
+        if (utcDate.Kind != DateTimeKind.Utc)
+            utcDate = DateTime.SpecifyKind(utcDate, DateTimeKind.Utc);
 
+        var tz = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+        return TimeZoneInfo.ConvertTimeFromUtc(utcDate, tz);
+    }
+
+    private string GetTimeZoneId()
+    {
+        var timeZoneId = _httpContextAccessor.HttpContext?.Request.Headers["X-Timezone-Id"].FirstOrDefault();
+
+        if (string.IsNullOrWhiteSpace(timeZoneId) || !IsValidTimeZone(timeZoneId))
+            return _defaultTimeZone;
+
+        return timeZoneId!;
+    }
+
+    private bool IsValidTimeZone(string? id)
+    {
+        return !string.IsNullOrWhiteSpace(id) &&
+               TimeZoneInfo.GetSystemTimeZones().Any(z => z.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
+    }
 }

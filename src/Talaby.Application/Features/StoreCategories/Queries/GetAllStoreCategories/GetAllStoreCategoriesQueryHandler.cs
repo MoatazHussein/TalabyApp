@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Talaby.Application.Common;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Domain.Entities;
 using Talaby.Domain.Repositories;
 
@@ -9,7 +10,8 @@ namespace Talaby.Application.Features.StoreCategories.Queries.GetAllStoreCategor
 
 public class GetAllStoreCategoriesQueryHandler(ILogger<GetAllStoreCategoriesQuery> logger,
     IMapper mapper,
-    IStoreCategoryRepository StoreCategoryCategoriesRepository) : IRequestHandler<GetAllStoreCategoriesQuery, PagedResult<StoreCategory>>
+    IStoreCategoryRepository StoreCategoryCategoriesRepository, ITimeZoneConverter timeZoneConverter) 
+    : IRequestHandler<GetAllStoreCategoriesQuery, PagedResult<StoreCategory>>
 {
     public async Task<PagedResult<StoreCategory>> Handle(GetAllStoreCategoriesQuery request, CancellationToken cancellationToken)
     {
@@ -22,8 +24,9 @@ public class GetAllStoreCategoriesQueryHandler(ILogger<GetAllStoreCategoriesQuer
 
 
         var result = new PagedResult<StoreCategory>(Categories, totalCount, request.PageSize, request.PageNumber);
-        return result;
+
+        return timeZoneConverter.ConvertUtcToLocal(result);
     }
 
- 
+
 }

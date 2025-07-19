@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Talaby.Application.Common;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Users.Dtos;
 using Talaby.Domain.Entities;
 
@@ -12,11 +13,13 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, PagedRe
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly IMapper _mapper;
+    private readonly ITimeZoneConverter _timeZoneConverter;
 
-    public GetAllUsersQueryHandler(UserManager<AppUser> userManager, IMapper mapper)
+    public GetAllUsersQueryHandler(UserManager<AppUser> userManager, IMapper mapper,ITimeZoneConverter timeZoneConverter)
     {
         _userManager = userManager;
         _mapper = mapper;
+        _timeZoneConverter = timeZoneConverter;
     }
 
     public async Task<PagedResult<UserDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
@@ -47,12 +50,10 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, PagedRe
             userDtos.Add(dto);
         }
 
-
         var pagedResult = new PagedResult<UserDto>(userDtos, totalCount, request.PageSize, request.PageNumber);
 
 
-        return pagedResult;
-       
+        return _timeZoneConverter.ConvertUtcToLocal(pagedResult);
     }
 }
 

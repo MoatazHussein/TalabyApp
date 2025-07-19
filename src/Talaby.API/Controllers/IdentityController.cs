@@ -141,4 +141,13 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
     }
 
 
+    [HttpPost("moyasar")]
+    public IActionResult MoyasarCallback([FromBody] object payment)
+    {
+        //Console.WriteLine($"Received payment: {JsonConvert.SerializeObject(payment)}");
+        return Ok(new { message = "Callback received" });
+    }
+
+
+
 }

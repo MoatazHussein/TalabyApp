@@ -5,7 +5,8 @@ using Talaby.Application.Common.Interfaces;
 
 namespace Talaby.Application.Features.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
 
-public class GetProposalsByProjectRequestIdHandler(IProjectProposalReadRepository repository, ICommercialRegisterNumberMasker mask)
+public class GetProposalsByProjectRequestIdHandler(IProjectProposalReadRepository repository, ICommercialRegisterNumberMasker mask,
+     ITimeZoneConverter timeZoneConverter)
         : IRequestHandler<GetProposalsByProjectRequestIdQuery, PagedResult<ProjectProposalListItemDto>>
 {
     public async Task<PagedResult<ProjectProposalListItemDto>> Handle(
@@ -26,6 +27,6 @@ public class GetProposalsByProjectRequestIdHandler(IProjectProposalReadRepositor
                 mask.Mask(reply.CreatorCommercialRegisterNumber);
         }
 
-        return result;
+        return timeZoneConverter.ConvertUtcToLocal(result);
     }
 }

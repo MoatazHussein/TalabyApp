@@ -4,8 +4,8 @@ using Talaby.Application.Common.Interfaces;
 
 namespace Talaby.Application.Features.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
 
-public class GetQuestionsByProjectRequestIdHandler(IProjectQuestionReadRepository repository, ICommercialRegisterNumberMasker mask)
-        : IRequestHandler<GetQuestionsByProjectRequestIdQuery, PagedResult<ProjectQuestionListItemDto>>
+public class GetQuestionsByProjectRequestIdHandler(IProjectQuestionReadRepository repository, ICommercialRegisterNumberMasker mask,
+    ITimeZoneConverter timeZoneConverter) : IRequestHandler<GetQuestionsByProjectRequestIdQuery, PagedResult<ProjectQuestionListItemDto>>
 {
     public async Task<PagedResult<ProjectQuestionListItemDto>> Handle(
         GetQuestionsByProjectRequestIdQuery request,
@@ -24,6 +24,6 @@ public class GetQuestionsByProjectRequestIdHandler(IProjectQuestionReadRepositor
                 mask.Mask(reply.CreatorCommercialRegisterNumber);
         }
 
-        return result;
+        return timeZoneConverter.ConvertUtcToLocal(result);
     }
 }
