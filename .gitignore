@@ -33,6 +33,7 @@ appsettings.Development.json
 publish/
 wwwroot/lib/
 node_modules/
+/Storage/*
 
 ###############################################
 # 📦 NuGet Packages

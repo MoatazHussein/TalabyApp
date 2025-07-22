@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.Extensions.FileProviders;
+using Serilog;
 using Talaby.API.Extensions;
 using Talaby.API.Middlewares;
 using Talaby.Application.Extensions;
@@ -51,6 +52,14 @@ if (app.Environment.IsProduction())
         c.SwaggerEndpoint("v1/swagger.json", "API V1.0");
     });
 }
+
+app.UseStaticFiles(new StaticFileOptions()
+
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Storage")),
+    RequestPath = new PathString("/Storage")
+});
+
 
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
