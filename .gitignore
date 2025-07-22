@@ -34,6 +34,7 @@ publish/
 wwwroot/lib/
 node_modules/
 /Storage/*
+!/Storage/.gitkeep
 
 ###############################################
 # 📦 NuGet Packages
