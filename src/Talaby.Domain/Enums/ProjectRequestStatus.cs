@@ -2,7 +2,7 @@
 
 public enum ProjectRequestStatus
 {
-    Open = 0,
-    Closed = 1,
-    Cancelled = 2,
+    Open = 1,
+    Closed = 2,
+    Cancelled = 3,
 }

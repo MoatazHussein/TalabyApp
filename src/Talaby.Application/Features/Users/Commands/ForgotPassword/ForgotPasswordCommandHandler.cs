@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Talaby.Application.Common.Interfaces;
 using Talaby.Domain.Entities;
+using Talaby.Domain.Exceptions;
 
 namespace Talaby.Application.Features.Users.Commands.ForgotPassword
 {
@@ -27,7 +28,7 @@ namespace Talaby.Application.Features.Users.Commands.ForgotPassword
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user is null || !await _userManager.IsEmailConfirmedAsync(user))
             {
-                return true;
+                throw new NotFoundException("User", request.Email);
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
