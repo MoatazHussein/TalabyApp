@@ -2,16 +2,23 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
 using Talaby.Application.Common.Interfaces;
+using Talaby.Application.Features.Payments.Contracts;
 using Talaby.Application.Features.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
 using Talaby.Application.Features.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
 using Talaby.Application.Features.Projects.ProposalReplies.Queries.RepliesByProposalId;
 using Talaby.Application.Features.Projects.QuestionReplies.Queries.RepliesByQuestionId;
 using Talaby.Domain.Entities;
 using Talaby.Domain.Repositories;
+using Talaby.Domain.Repositories.Payments;
 using Talaby.Domain.Repositories.Projects;
+using Talaby.Infrastructure.Payments;
+using Talaby.Infrastructure.Payments.Configuration;
 using Talaby.Infrastructure.Persistence;
 using Talaby.Infrastructure.Repositories;
+using Talaby.Infrastructure.Repositories.Payments;
 using Talaby.Infrastructure.Repositories.Projects;
 using Talaby.Infrastructure.Seeders;
 using Talaby.Infrastructure.Services.DataVisibilityPolicy;
@@ -53,11 +60,33 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IProjectQuestionReadRepository, ProjectQuestionReadRepository>();
         services.AddScoped<IQuestionReplyReadRepository, QuestionReplyReadRepository>();
 
+        services.AddScoped<IProjectCommissionPaymentRepository, ProjectCommissionPaymentRepository>();
+
+        // Tap HTTP client — auth header is set once at registration time from config.
+        // TapPaymentService uses IHttpClientFactory to get a pre-configured client.
+        services.AddHttpClient("TapClient", (sp, client) =>
+        {
+            var tapOpts = sp.GetRequiredService<IOptions<TapOptions>>().Value;
+            client.BaseAddress = new Uri(tapOpts.BaseUrl);
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", tapOpts.SecretKey);
+        });
+
+        services.AddScoped<ITapPaymentService, TapPaymentService>();
+        services.AddScoped<ITapWebhookValidator, TapWebhookValidator>();
+
         services.AddScoped<ICommercialRegisterNumberMasker, CommercialRegisterNumberMasker>();
 
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddScoped<ITimeZoneConverter, TimeZoneConverter>();
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+
+
+        services.AddOptions<TapOptions>()
+            .Bind(configuration.GetSection(TapOptions.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(options => !string.IsNullOrWhiteSpace(options.BaseUrl), "Tap:BaseUrl is required.")
+            .ValidateOnStart();
 
     }
 

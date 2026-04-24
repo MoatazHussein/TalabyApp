@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Talaby.Domain.Entities;
+using Talaby.Domain.Entities.Payments;
 using Talaby.Domain.Entities.Projects;
 
 namespace Talaby.Infrastructure.Persistence;
@@ -16,6 +17,9 @@ public class TalabyDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     public DbSet<ProposalReply> ProposalReplies { get; set; }
     public DbSet<ProjectQuestion> ProjectQuestions { get; set; }
     public DbSet<QuestionReply> QuestionReplies { get; set; }
+    public DbSet<ProjectCommissionPayment> ProjectCommissionPayments { get; set; }
+    public DbSet<ProjectCommissionPaymentAttempt> ProjectCommissionPaymentAttempts { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

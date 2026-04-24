@@ -1,10 +1,13 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Talaby.Application.Features.Payments.Commands.CreateProjectCommissionCheckout;
+using Talaby.Application.Features.Payments.Queries.VerifyProjectCommissionPayment;
 using Talaby.Application.Features.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
 using Talaby.Application.Features.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
 using Talaby.Application.Features.Projects.ProjectRequests.Commands.CreateProjectRequest;
 using Talaby.Application.Features.Projects.ProjectRequests.Commands.DeleteProjectRequest;
+using Talaby.Application.Features.Projects.ProjectRequests.Commands.MarkProjectRequestAsDone;
 using Talaby.Application.Features.Projects.ProjectRequests.Commands.UpdateProjectRequest;
 using Talaby.Application.Features.Projects.ProjectRequests.Commands.UpdateProjectRequestStatus;
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.Dtos;
@@ -79,6 +82,31 @@ public class ProjectRequestsController (IMediator mediator) : ControllerBase
         await mediator.Send(new DeleteProjectRequestCommand(id));
 
         return StatusCode(200, $"Deleted successfully");
+    }
+
+    [HttpPatch("{id}/mark-done")]
+    public async Task<IActionResult> MarkAsDone([FromRoute] Guid id)
+    {
+        await mediator.Send(new MarkProjectRequestAsDoneCommand(id));
+        return StatusCode(200, "Project marked as done. Awaiting commission payment.");
+    }
+
+    [HttpPost("{id}/commission-payment/checkout")]
+    public async Task<ActionResult<CreateProjectCommissionCheckoutResponse>> InitiateCommissionCheckout(
+        [FromRoute] Guid id)
+    {
+        var result = await mediator.Send(new CreateProjectCommissionCheckoutCommand(id));
+        return Ok(result);
+    }
+
+    [HttpGet("{id}/commission-payment/verify")]
+    public async Task<ActionResult<VerifyProjectCommissionPaymentResponse>> VerifyCommissionPayment(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(
+            new VerifyProjectCommissionPaymentQuery(id), cancellationToken);
+        return Ok(result);
     }
 
 }

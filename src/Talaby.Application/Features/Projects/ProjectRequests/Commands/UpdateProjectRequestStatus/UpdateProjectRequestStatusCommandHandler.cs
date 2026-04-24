@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Talaby.Application.Features.Users;
 using Talaby.Domain.Entities.Projects;
+using Talaby.Domain.Enums;
 using Talaby.Domain.Exceptions;
 using Talaby.Domain.Repositories.Projects;
 
@@ -26,7 +27,11 @@ public class UpdateProjectRequestStatusCommandHandler(ILogger<UpdateProjectReque
         if (projectRequest.CreatorId != currentUser.Id)
             throw new BusinessRuleException("You are not allowed to Update this project.", 403);
 
-        projectRequest.Status = request.NewStatus;
+        if (request.NewStatus != ProjectRequestStatus.Cancelled)
+            throw new BusinessRuleException(
+                "Direct status updates are only permitted for cancellation.", 422);
+
+        projectRequest.MarkCancelled();
 
         await projectRequestRepository.SaveChanges();
     }

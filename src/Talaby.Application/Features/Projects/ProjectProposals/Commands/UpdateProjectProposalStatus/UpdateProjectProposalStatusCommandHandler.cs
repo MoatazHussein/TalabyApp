@@ -1,7 +1,4 @@
-﻿using System;
-using AutoMapper;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Users;
@@ -30,10 +27,6 @@ public class UpdateProjectProposalStatusCommandHandler(ILogger<UpdateProjectProp
         if (projectRequest is null)
             throw new NotFoundException(nameof(ProjectRequest), projectProposal.ProjectRequestId.ToString());
 
-
-        //if (projectRequest.Status == ProjectRequestStatus.Closed)
-        //    throw new BusinessRuleException("can't change status for proposal of closed project", 409);
-
         var allowedStoreActions = new[] { ProjectProposalStatus.Cancelled };
         var allowedClientActions = new[] { ProjectProposalStatus.Accepted, ProjectProposalStatus.Rejected , ProjectProposalStatus.Cancelled };
 
@@ -57,31 +50,35 @@ public class UpdateProjectProposalStatusCommandHandler(ILogger<UpdateProjectProp
         if (acceptedProjectProposal != null && acceptedProjectProposal.Any(pp=> pp.Id != projectProposal.Id) && request.NewStatus == ProjectProposalStatus.Accepted)
             throw new BusinessRuleException("Another proposal has already been accepted for this project request.", 409);
 
-        projectProposal.Status = request.NewStatus;
-
-        // If the proposal is accepted, close the project request 
-        if (request.NewStatus == ProjectProposalStatus.Accepted)
+        switch (request.NewStatus)
         {
-            projectRequest.Status = ProjectRequestStatus.Closed;
+            case ProjectProposalStatus.Accepted:
+                projectProposal.Accept();
+                projectRequest.MarkInProgress();
 
-            var otherProposals = await projectProposalRepository.GetAllAsync(
-                pp => pp.ProjectRequestId == projectRequest.Id
-                           && pp.Id != request.Id
-                           && pp.Status == ProjectProposalStatus.Pending
+                var otherPendingProposals = await projectProposalRepository.GetAllAsync(
+                    pp => pp.ProjectRequestId == projectRequest.Id
+                          && pp.Id != request.Id
+                          && pp.Status == ProjectProposalStatus.Pending,
+                    cancellationToken);
 
-                , cancellationToken);
+                foreach (var other in otherPendingProposals)
+                    other.Reject();
 
-            foreach (var other in otherProposals)
-            {
-                other.Status = ProjectProposalStatus.Rejected;
-            }
-        }
+                break;
 
-        var projectInitiationStatuses = new[] { ProjectProposalStatus.Rejected, ProjectProposalStatus.Cancelled };
+            case ProjectProposalStatus.Rejected:
+                projectProposal.Reject();
+                projectRequest.MarkOpen();
+                break;
 
-        if (projectInitiationStatuses.Contains(request.NewStatus))
-        {
-            projectRequest.Status = ProjectRequestStatus.Open;
+            case ProjectProposalStatus.Cancelled:
+                projectProposal.Cancel();
+                projectRequest.MarkOpen();
+                break;
+
+            default:
+                throw new BusinessRuleException($"Status transition to {request.NewStatus} is not supported.", 422);
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
