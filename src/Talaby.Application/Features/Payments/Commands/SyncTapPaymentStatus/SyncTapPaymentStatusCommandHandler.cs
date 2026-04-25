@@ -17,13 +17,17 @@ public sealed class SyncTapPaymentStatusCommandHandler(
 {
     public async Task Handle(SyncTapPaymentStatusCommand request, CancellationToken cancellationToken)
     {
+        logger.LogDebug(
+            "SyncTapPaymentStatus started. ProjectRequestId={ProjectRequestId}",
+            request.ProjectRequestId);
+
         var commissionPayment = await commissionPaymentRepository
             .GetWithAttemptsByProjectRequestIdAsync(request.ProjectRequestId, cancellationToken);
 
         if (commissionPayment is null)
         {
             logger.LogDebug(
-                "SyncTapPaymentStatus: no commission payment found for ProjectRequest {Id}. Nothing to sync.",
+                "SyncTapPaymentStatus: no commission payment found. ProjectRequestId={ProjectRequestId}",
                 request.ProjectRequestId);
             return;
         }
@@ -32,8 +36,8 @@ public sealed class SyncTapPaymentStatusCommandHandler(
         if (commissionPayment.IsFinalState())
         {
             logger.LogDebug(
-                "SyncTapPaymentStatus: payment {PaymentId} is already in a final state. Skipping Tap call.",
-                commissionPayment.Id);
+                "SyncTapPaymentStatus: skipped, payment already in final state. ProjectRequestId={ProjectRequestId}, CommissionPaymentId={CommissionPaymentId}, PaymentStatus={PaymentStatus}",
+                request.ProjectRequestId, commissionPayment.Id, commissionPayment.Status);
             return;
         }
 
@@ -45,8 +49,8 @@ public sealed class SyncTapPaymentStatusCommandHandler(
         if (latestAttempt is null)
         {
             logger.LogDebug(
-                "SyncTapPaymentStatus: no submitted attempt found for payment {PaymentId}. Nothing to sync.",
-                commissionPayment.Id);
+                "SyncTapPaymentStatus: no submitted attempt found. ProjectRequestId={ProjectRequestId}, CommissionPaymentId={CommissionPaymentId}",
+                request.ProjectRequestId, commissionPayment.Id);
             return;
         }
 
@@ -60,8 +64,8 @@ public sealed class SyncTapPaymentStatusCommandHandler(
         {
             logger.LogWarning(
                 ex,
-                "SyncTapPaymentStatus: Tap retrieve-charge failed for ChargeId={ChargeId}. Local state unchanged.",
-                latestAttempt.ProviderChargeId);
+                "SyncTapPaymentStatus: Tap retrieve-charge failed. ProjectRequestId={ProjectRequestId}, CommissionPaymentId={CommissionPaymentId}, ChargeId={ChargeId}. Local state unchanged.",
+                request.ProjectRequestId, commissionPayment.Id, latestAttempt.ProviderChargeId);
             return;
         }
 
@@ -80,16 +84,16 @@ public sealed class SyncTapPaymentStatusCommandHandler(
                 if (projectRequest is null)
                 {
                     logger.LogError(
-                        "SyncTapPaymentStatus: ProjectRequest {Id} not found after charge confirmed CAPTURED.",
-                        commissionPayment.ProjectRequestId);
+                        "SyncTapPaymentStatus: ProjectRequest not found after charge confirmed CAPTURED. ProjectRequestId={ProjectRequestId}, CommissionPaymentId={CommissionPaymentId}",
+                        commissionPayment.ProjectRequestId, commissionPayment.Id);
                     return;
                 }
 
                 projectRequest.MarkCompleted();
 
                 logger.LogInformation(
-                    "SyncTapPaymentStatus: payment confirmed. PaymentId={PaymentId}, ChargeId={ChargeId}",
-                    commissionPayment.Id, latestAttempt.ProviderChargeId);
+                    "SyncTapPaymentStatus: payment confirmed via retrieve-charge. ProjectRequestId={ProjectRequestId}, CommissionPaymentId={CommissionPaymentId}, AttemptId={AttemptId}, ChargeId={ChargeId}",
+                    request.ProjectRequestId, commissionPayment.Id, latestAttempt.Id, latestAttempt.ProviderChargeId);
                 break;
 
             case TapChargeOutcome.TerminalFailure:
@@ -97,14 +101,14 @@ public sealed class SyncTapPaymentStatusCommandHandler(
                 commissionPayment.MarkFailed();
 
                 logger.LogWarning(
-                    "SyncTapPaymentStatus: payment failed. PaymentId={PaymentId}, ChargeId={ChargeId}, Status={Status}",
-                    commissionPayment.Id, latestAttempt.ProviderChargeId, tapCharge.ProviderStatus);
+                    "SyncTapPaymentStatus: payment failed via retrieve-charge. ProjectRequestId={ProjectRequestId}, CommissionPaymentId={CommissionPaymentId}, AttemptId={AttemptId}, ChargeId={ChargeId}, ProviderStatus={ProviderStatus}",
+                    request.ProjectRequestId, commissionPayment.Id, latestAttempt.Id, latestAttempt.ProviderChargeId, tapCharge.ProviderStatus);
                 break;
 
             default:
                 logger.LogDebug(
-                    "SyncTapPaymentStatus: charge {ChargeId} still non-final ({Status}). No state change.",
-                    latestAttempt.ProviderChargeId, tapCharge.ProviderStatus);
+                    "SyncTapPaymentStatus: charge still non-final. ProjectRequestId={ProjectRequestId}, ChargeId={ChargeId}, ProviderStatus={ProviderStatus}",
+                    request.ProjectRequestId, latestAttempt.ProviderChargeId, tapCharge.ProviderStatus);
                 return; 
         }
 

@@ -30,6 +30,8 @@ public class PaymentsController(
 
         var hashstring = Request.Headers[TapHashstringHeader].FirstOrDefault() ?? string.Empty;
 
+        logger.LogDebug("Tap webhook received. PayloadLength={PayloadLength}", rawPayload.Length);
+
         try
         {
             await mediator.Send(
@@ -38,7 +40,9 @@ public class PaymentsController(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unhandled error processing Tap webhook. Hashstring={Hashstring}", hashstring);
+            logger.LogError(ex,
+                "Unhandled exception processing Tap webhook. PayloadLength={PayloadLength}",
+                rawPayload.Length);
         }
 
         return Ok();

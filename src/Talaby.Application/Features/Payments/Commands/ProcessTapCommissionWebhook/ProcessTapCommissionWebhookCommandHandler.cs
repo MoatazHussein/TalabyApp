@@ -25,7 +25,9 @@ public sealed class ProcessTapCommissionWebhookCommandHandler(
         // 1. Authenticate — reject anything with an invalid signature.
         if (!webhookValidator.IsValid(request.RawPayload, request.ReceivedHashstring))
         {
-            logger.LogWarning("Tap webhook rejected: invalid hashstring.");
+            logger.LogWarning(
+                "Tap webhook rejected: invalid hashstring. PayloadLength={PayloadLength}",
+                request.RawPayload.Length);
             throw new UnauthorizedAccessException("Invalid Tap webhook signature.");
         }
 
@@ -81,8 +83,8 @@ public sealed class ProcessTapCommissionWebhookCommandHandler(
         if (commissionPayment.Status == ProjectCommissionPaymentStatus.Paid)
         {
             logger.LogInformation(
-                "Tap webhook is a duplicate for already-paid ChargeId={ChargeId}. No-op.",
-                chargeId);
+                "Tap webhook is a duplicate for already-paid charge. CommissionPaymentId={CommissionPaymentId}, ChargeId={ChargeId}. No-op.",
+                commissionPayment.Id, chargeId);
             return;
         }
 
@@ -123,8 +125,8 @@ public sealed class ProcessTapCommissionWebhookCommandHandler(
                 projectRequest.MarkCompleted();
 
                 logger.LogInformation(
-                    "Commission payment confirmed via webhook. PaymentId={PaymentId}, ProjectRequestId={ProjectRequestId}",
-                    commissionPayment.Id, projectRequest.Id);
+                    "Commission payment confirmed via webhook. ProjectRequestId={ProjectRequestId}, CommissionPaymentId={CommissionPaymentId}, AttemptId={AttemptId}, ChargeId={ChargeId}",
+                    projectRequest.Id, commissionPayment.Id, attempt.Id, chargeId);
                 break;
 
             case TapChargeOutcome.TerminalFailure:
@@ -132,8 +134,8 @@ public sealed class ProcessTapCommissionWebhookCommandHandler(
                 commissionPayment.MarkFailed();
 
                 logger.LogWarning(
-                    "Commission payment failed via webhook. PaymentId={PaymentId}, TapStatus={Status}, Reason={Reason}",
-                    commissionPayment.Id, chargeStatus, failureMessage);
+                    "Commission payment failed via webhook. CommissionPaymentId={CommissionPaymentId}, AttemptId={AttemptId}, ChargeId={ChargeId}, ProviderStatus={ProviderStatus}, Reason={Reason}",
+                    commissionPayment.Id, attempt.Id, chargeId, chargeStatus, failureMessage);
                 break;
 
             default:

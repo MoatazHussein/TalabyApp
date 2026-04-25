@@ -85,6 +85,10 @@ public class CreateProjectCommissionCheckoutCommandHandler(
 
         await commissionPaymentRepository.AddAttemptAsync(attempt, cancellationToken);
 
+        logger.LogInformation(
+            "Commission checkout initiated. ProjectRequestId={ProjectRequestId}, CommissionPaymentId={CommissionPaymentId}, AttemptId={AttemptId}, UserId={UserId}",
+            request.ProjectRequestId, commissionPayment.Id, attempt.Id, currentUser.Id);
+
         // 9. Build the Tap create-charge request using only snapshotted values
         var tapOpts = tapCheckoutOptions.Value;
         var (phoneCountry, phoneNumber) = ParsePhone(client?.Mobile);
@@ -114,8 +118,8 @@ public class CreateProjectCommissionCheckoutCommandHandler(
         catch (Exception ex)
         {
             logger.LogError(ex,
-                "Tap create-charge failed. CommissionPaymentId={PaymentId}, CorrelationId={CorrelationId}",
-                commissionPayment.Id, correlationId);
+                "Tap create-charge failed. ProjectRequestId={ProjectRequestId}, CommissionPaymentId={CommissionPaymentId}, AttemptId={AttemptId}, CorrelationId={CorrelationId}",
+                request.ProjectRequestId, commissionPayment.Id, attempt.Id, correlationId);
 
             var failureReason = ex.Message.Length > 500 ? ex.Message[..500] : ex.Message;
             attempt.SetFailed(failureReason, DateTime.UtcNow);

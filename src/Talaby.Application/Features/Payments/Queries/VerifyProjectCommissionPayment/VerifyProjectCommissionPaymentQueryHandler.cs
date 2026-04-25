@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Talaby.Application.Features.Users;
 using Talaby.Domain.Constants;
 using Talaby.Domain.Enums;
@@ -11,7 +12,8 @@ namespace Talaby.Application.Features.Payments.Queries.VerifyProjectCommissionPa
 public sealed class VerifyProjectCommissionPaymentQueryHandler(
     IProjectRequestRepository projectRequestRepository,
     IProjectCommissionPaymentRepository commissionPaymentRepository,
-    IUserContext userContext)
+    IUserContext userContext,
+    ILogger<VerifyProjectCommissionPaymentQueryHandler> logger)
     : IRequestHandler<VerifyProjectCommissionPaymentQuery, VerifyProjectCommissionPaymentResponse>
 {
     public async Task<VerifyProjectCommissionPaymentResponse> Handle(
@@ -32,6 +34,10 @@ public sealed class VerifyProjectCommissionPaymentQueryHandler(
 
         var commissionPayment = await commissionPaymentRepository
             .GetByProjectRequestIdAsync(request.ProjectRequestId, cancellationToken);
+
+        logger.LogDebug(
+            "Verify commission payment. ProjectRequestId={ProjectRequestId}, UserId={UserId}, ProjectStatus={ProjectStatus}, PaymentStatus={PaymentStatus}",
+            request.ProjectRequestId, currentUser.Id, projectRequest.Status, commissionPayment?.Status);
 
         return new VerifyProjectCommissionPaymentResponse(
             ProjectRequestId: request.ProjectRequestId,

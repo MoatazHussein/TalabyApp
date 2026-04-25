@@ -33,19 +33,37 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
             context.Response.StatusCode = 500;
             await context.Response.WriteAsync(ex.Message);
         }
-        catch (DbUpdateException) 
+        catch (DbUpdateException)
         {
             context.Response.StatusCode = 500;
             await context.Response.WriteAsync("Database update failed");
         }
-        catch (BusinessRuleException ex) 
+        catch (PaymentGatewayException ex)
         {
+            logger.LogWarning(ex,
+                "Payment gateway error. Path={Path}",
+                context.Request.Path);
+
+            context.Response.StatusCode = 502;
+            await context.Response.WriteAsync("Payment gateway error. Please try again later.");
+        }
+        catch (BusinessRuleException ex)
+        {
+            if (ex.StatusCode >= 500)
+            {
+                logger.LogWarning(ex,
+                    "Business rule exception with server-side status. StatusCode={StatusCode}, Path={Path}",
+                    ex.StatusCode, context.Request.Path);
+            }
+
             context.Response.StatusCode = ex.StatusCode;
             await context.Response.WriteAsync(ex.Message);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ex.Message);
+            logger.LogError(ex,
+                "Unhandled exception. Path={Path}, Method={Method}",
+                context.Request.Path, context.Request.Method);
 
             context.Response.StatusCode = 500;
             await context.Response.WriteAsync("Something went wrong");
