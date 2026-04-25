@@ -109,6 +109,9 @@ public class ProjectCommissionPayment
         _paymentAttempts.Add(attempt);
     }
 
+    public bool IsFinalState() =>
+        Status is ProjectCommissionPaymentStatus.Paid or ProjectCommissionPaymentStatus.Failed;
+
     private static decimal CalculateCommissionAmount(decimal proposalAmount, decimal percentage)
     {
         return Math.Round(proposalAmount * (percentage / 100m), 3, MidpointRounding.AwayFromZero);

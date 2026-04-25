@@ -10,6 +10,8 @@ public interface IProjectCommissionPaymentRepository
 
     Task<ProjectCommissionPayment?> GetByProjectRequestIdAsync(Guid projectRequestId, CancellationToken cancellationToken = default);
 
+    Task<ProjectCommissionPayment?> GetWithAttemptsByProjectRequestIdAsync(Guid projectRequestId, CancellationToken cancellationToken = default);
+
     Task AddAttemptAsync(ProjectCommissionPaymentAttempt attempt, CancellationToken cancellationToken = default);
 
     Task<ProjectCommissionPayment?> GetWithAttemptsByProviderChargeIdAsync(

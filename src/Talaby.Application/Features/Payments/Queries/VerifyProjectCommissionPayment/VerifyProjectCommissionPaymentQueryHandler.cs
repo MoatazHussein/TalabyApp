@@ -24,7 +24,6 @@ public sealed class VerifyProjectCommissionPaymentQueryHandler(
         var projectRequest = await projectRequestRepository.GetByIdAsync(request.ProjectRequestId)
             ?? throw new NotFoundException("ProjectRequest", request.ProjectRequestId.ToString());
 
-        // Only the client who owns the project (or an admin) may verify the payment status.
         var isOwner = projectRequest.CreatorId == currentUser.Id;
         var isAdmin = currentUser.IsInRole(UserRoles.Admin);
 

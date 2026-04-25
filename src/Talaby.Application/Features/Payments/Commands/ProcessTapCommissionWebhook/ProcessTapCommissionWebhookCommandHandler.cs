@@ -18,15 +18,6 @@ public sealed class ProcessTapCommissionWebhookCommandHandler(
     ILogger<ProcessTapCommissionWebhookCommandHandler> logger)
     : IRequestHandler<ProcessTapCommissionWebhookCommand>
 {
-    // Tap's terminal success status for a charge.
-    private const string TapCapturedStatus = "CAPTURED";
-
-    // Terminal failure statuses that should mark the attempt/payment as failed.
-    private static readonly HashSet<string> TerminalFailureStatuses = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "DECLINED", "FAILED", "CANCELLED", "ABANDONED", "RESTRICTED", "TIMEDOUT", "VOID"
-    };
-
     public async Task Handle(
         ProcessTapCommissionWebhookCommand request,
         CancellationToken cancellationToken)
@@ -80,14 +71,13 @@ public sealed class ProcessTapCommissionWebhookCommandHandler(
 
         if (commissionPayment is null)
         {
-            // Tap may send webhooks for test charges or other untracked charges — log and ignore.
             logger.LogWarning(
                 "Tap webhook received for unknown ChargeId={ChargeId}. No matching payment found.",
                 chargeId);
             return;
         }
 
-        // 4. Idempotency — if the payment is already confirmed paid, this is a duplicate webhook.
+        // 4. Idempotency — if already paid, this is a duplicate webhook.
         if (commissionPayment.Status == ProjectCommissionPaymentStatus.Paid)
         {
             logger.LogInformation(
@@ -102,56 +92,55 @@ public sealed class ProcessTapCommissionWebhookCommandHandler(
 
         if (attempt is null)
         {
-            // Should not happen given GetWithAttemptsByProviderChargeIdAsync, but guard anyway.
             logger.LogError(
                 "Tap webhook: attempt for ChargeId={ChargeId} not found inside loaded payment {PaymentId}.",
                 chargeId, commissionPayment.Id);
             return;
         }
 
+        // 6. Map provider status and apply domain transitions.
+        var outcome = TapChargeStatusMapper.Map(chargeStatus);
         var now = DateTime.UtcNow;
 
-        if (string.Equals(chargeStatus, TapCapturedStatus, StringComparison.OrdinalIgnoreCase))
+        switch (outcome)
         {
-            // 6a. Payment succeeded — mark attempt, payment, and project request as completed.
-            attempt.SetPaid(now);
-            commissionPayment.MarkPaid(now);
+            case TapChargeOutcome.Success:
+                attempt.SetPaid(now);
+                commissionPayment.MarkPaid(now);
 
-            var projectRequest = await projectRequestRepository
-                .GetByIdAsync(commissionPayment.ProjectRequestId);
+                var projectRequest = await projectRequestRepository
+                    .GetByIdAsync(commissionPayment.ProjectRequestId);
 
-            if (projectRequest is null)
-            {
-                logger.LogError(
-                    "Tap webhook: ProjectRequest {ProjectRequestId} not found for ChargeId={ChargeId}.",
-                    commissionPayment.ProjectRequestId, chargeId);
-                throw new InvalidOperationException(
-                    $"ProjectRequest {commissionPayment.ProjectRequestId} not found.");
-            }
+                if (projectRequest is null)
+                {
+                    logger.LogError(
+                        "Tap webhook: ProjectRequest {ProjectRequestId} not found for ChargeId={ChargeId}.",
+                        commissionPayment.ProjectRequestId, chargeId);
+                    throw new InvalidOperationException(
+                        $"ProjectRequest {commissionPayment.ProjectRequestId} not found.");
+                }
 
-            projectRequest.MarkCompleted();
+                projectRequest.MarkCompleted();
 
-            logger.LogInformation(
-                "Commission payment confirmed. PaymentId={PaymentId}, ProjectRequestId={ProjectRequestId}",
-                commissionPayment.Id, projectRequest.Id);
-        }
-        else if (TerminalFailureStatuses.Contains(chargeStatus))
-        {
-            // 6b. Payment failed — mark attempt and payment accordingly.
-            attempt.SetFailed(failureMessage, now);
-            commissionPayment.MarkFailed();
+                logger.LogInformation(
+                    "Commission payment confirmed via webhook. PaymentId={PaymentId}, ProjectRequestId={ProjectRequestId}",
+                    commissionPayment.Id, projectRequest.Id);
+                break;
 
-            logger.LogWarning(
-                "Commission payment failed. PaymentId={PaymentId}, TapStatus={Status}, Reason={Reason}",
-                commissionPayment.Id, chargeStatus, failureMessage);
-        }
-        else
-        {
-            // Non-terminal status (e.g., INITIATED, INPROGRESS) — nothing to do yet.
-            logger.LogInformation(
-                "Tap webhook received non-terminal status {Status} for ChargeId={ChargeId}. No action taken.",
-                chargeStatus, chargeId);
-            return;
+            case TapChargeOutcome.TerminalFailure:
+                attempt.SetFailed(failureMessage, now);
+                commissionPayment.MarkFailed();
+
+                logger.LogWarning(
+                    "Commission payment failed via webhook. PaymentId={PaymentId}, TapStatus={Status}, Reason={Reason}",
+                    commissionPayment.Id, chargeStatus, failureMessage);
+                break;
+
+            default:
+                logger.LogInformation(
+                    "Tap webhook received non-terminal status {Status} for ChargeId={ChargeId}. No action taken.",
+                    chargeStatus, chargeId);
+                return;
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

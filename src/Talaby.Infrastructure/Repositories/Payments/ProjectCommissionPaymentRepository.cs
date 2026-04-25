@@ -26,6 +26,14 @@ public class ProjectCommissionPaymentRepository(TalabyDbContext dbContext)
             .FirstOrDefaultAsync(p => p.ProjectRequestId == projectRequestId, cancellationToken);
     }
 
+    public Task<ProjectCommissionPayment?> GetWithAttemptsByProjectRequestIdAsync(
+        Guid projectRequestId, CancellationToken cancellationToken = default)
+    {
+        return dbContext.ProjectCommissionPayments
+            .Include(p => p.PaymentAttempts)
+            .FirstOrDefaultAsync(p => p.ProjectRequestId == projectRequestId, cancellationToken);
+    }
+
     public async Task AddAttemptAsync(
         ProjectCommissionPaymentAttempt attempt, CancellationToken cancellationToken = default)
     {

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Talaby.Application.Features.Payments.Commands.CreateProjectCommissionCheckout;
+using Talaby.Application.Features.Payments.Commands.SyncTapPaymentStatus;
 using Talaby.Application.Features.Payments.Queries.VerifyProjectCommissionPayment;
 using Talaby.Application.Features.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
 using Talaby.Application.Features.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
@@ -104,6 +105,8 @@ public class ProjectRequestsController (IMediator mediator) : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
+        await mediator.Send(new SyncTapPaymentStatusCommand(id), cancellationToken);
+
         var result = await mediator.Send(
             new VerifyProjectCommissionPaymentQuery(id), cancellationToken);
         return Ok(result);

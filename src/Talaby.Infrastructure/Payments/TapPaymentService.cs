@@ -141,6 +141,51 @@ public class TapPaymentService(
         return responseBody.Length > 400 ? responseBody[..400] : responseBody;
     }
 
+    // ── Retrieve charge ──────────────────────────────────────────────────────
+
+    public async Task<TapRetrieveChargeResponse> RetrieveChargeAsync(
+        string providerChargeId,
+        CancellationToken cancellationToken = default)
+    {
+        logger.LogDebug("Calling Tap retrieve-charge. ChargeId={ChargeId}", providerChargeId);
+
+        var httpClient = httpClientFactory.CreateClient("TapClient");
+        using var response = await httpClient.GetAsync($"/v2/charges/{providerChargeId}", cancellationToken);
+        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorMessage = ExtractTapError(responseBody);
+            logger.LogWarning(
+                "Tap retrieve-charge failed. ChargeId={ChargeId}, Status={Status}, Error={Error}",
+                providerChargeId, (int)response.StatusCode, errorMessage);
+
+            throw new PaymentGatewayException(
+                $"Tap retrieve-charge failed ({(int)response.StatusCode}): {errorMessage}");
+        }
+
+        var tapResponse = JsonSerializer.Deserialize<TapRetrieveChargeApiResponse>(responseBody, JsonOptions);
+
+        if (tapResponse is null || string.IsNullOrWhiteSpace(tapResponse.Id))
+        {
+            logger.LogError(
+                "Tap retrieve-charge returned success but response was invalid. ChargeId={ChargeId}, Body={Body}",
+                providerChargeId, responseBody);
+            throw new PaymentGatewayException("Tap returned an unexpected response format for retrieve-charge.");
+        }
+
+        logger.LogInformation(
+            "Tap retrieve-charge succeeded. ChargeId={ChargeId}, Status={Status}",
+            tapResponse.Id, tapResponse.Status);
+
+        var failureMessage = tapResponse.Response?.Message;
+
+        return new TapRetrieveChargeResponse(
+            ProviderChargeId: tapResponse.Id,
+            ProviderStatus: tapResponse.Status ?? string.Empty,
+            FailureMessage: failureMessage);
+    }
+
     // ── Private Tap API JSON models ──────────────────────────────────────────
 
     private sealed class TapChargePayload
@@ -248,5 +293,25 @@ public class TapPaymentService(
     {
         [JsonPropertyName("url")]
         public string? Url { get; init; }
+    }
+
+    // ── Retrieve-charge response models ─────────────────────────────────────
+
+    private sealed class TapRetrieveChargeApiResponse
+    {
+        [JsonPropertyName("id")]
+        public string? Id { get; init; }
+
+        [JsonPropertyName("status")]
+        public string? Status { get; init; }
+
+        [JsonPropertyName("response")]
+        public TapResponseMessage? Response { get; init; }
+    }
+
+    private sealed class TapResponseMessage
+    {
+        [JsonPropertyName("message")]
+        public string? Message { get; init; }
     }
 }

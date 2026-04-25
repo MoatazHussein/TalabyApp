@@ -4,6 +4,7 @@ using Serilog;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Talaby.API.Extensions;
 
@@ -11,7 +12,9 @@ public static class WebApplicationBuilderExtensions
 {
     public static void AddPresentation(this WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+                        .AddJsonOptions(opts => opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+        
         builder.Services.AddSwaggerGen(c =>
         {
             c.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme
@@ -57,7 +60,6 @@ public static class WebApplicationBuilderExtensions
     });
 
         builder.Services.AddAuthorization();
-
 
         builder.Services.AddEndpointsApiExplorer();
 
