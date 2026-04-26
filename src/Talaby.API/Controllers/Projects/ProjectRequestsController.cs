@@ -17,31 +17,30 @@ using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetProjectReq
 
 namespace Talaby.API.Controllers.Projects;
 
-[ApiController]
 [Authorize]
 [Route("api/project-requests")]
-public class ProjectRequestsController (IMediator mediator) : ControllerBase
+public class ProjectRequestsController(IMediator mediator) : BaseApiController
 {
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProjectRequestDto>>> GetAll([FromQuery] GetAllProjectRequestsQuery query)
     {
         var projectRequests = await mediator.Send(query);
-        return Ok(projectRequests);
+        return OkResponse(projectRequests);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ProjectRequestDto?>> GetById([FromRoute] Guid id)
     {
         var projectRequest = await mediator.Send(new GetProjectRequestByIdQuery(id));
-        return Ok(projectRequest);
+        return OkResponse(projectRequest);
     }
 
     [HttpGet("{id}/proposals")]
     public async Task<IActionResult> GetProposals(Guid id, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         var result = await mediator.Send(new GetProposalsByProjectRequestIdQuery(id, page, pageSize));
-        return Ok(result);
+        return OkResponse(result);
     }
 
 
@@ -49,7 +48,7 @@ public class ProjectRequestsController (IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetQuestions(Guid id, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         var result = await mediator.Send(new GetQuestionsByProjectRequestIdQuery(id, page, pageSize));
-        return Ok(result);
+        return OkResponse(result);
     }
 
 
@@ -57,7 +56,7 @@ public class ProjectRequestsController (IMediator mediator) : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateProjectRequestCommand command)
     {
         var id = await mediator.Send(command);
-        return CreatedAtAction(nameof(GetById), new { id }, null);
+        return CreatedResponse(nameof(GetById), new { id }, id);
     }
 
 
@@ -66,7 +65,7 @@ public class ProjectRequestsController (IMediator mediator) : ControllerBase
     {
         await mediator.Send(command);
 
-        return StatusCode(200, $"Updated successfully");
+        return OkResponse("Updated successfully");
     }
 
     [HttpPatch("status")]
@@ -74,7 +73,7 @@ public class ProjectRequestsController (IMediator mediator) : ControllerBase
     {
         await mediator.Send(command);
 
-        return StatusCode(200, $"Updated successfully");
+        return OkResponse("Updated successfully");
     }
 
     [HttpDelete("{id}")]
@@ -82,14 +81,14 @@ public class ProjectRequestsController (IMediator mediator) : ControllerBase
     {
         await mediator.Send(new DeleteProjectRequestCommand(id));
 
-        return StatusCode(200, $"Deleted successfully");
+        return OkResponse("Deleted successfully");
     }
 
     [HttpPatch("{id}/mark-done")]
     public async Task<IActionResult> MarkAsDone([FromRoute] Guid id)
     {
         await mediator.Send(new MarkProjectRequestAsDoneCommand(id));
-        return StatusCode(200, "Project marked as done. Awaiting commission payment.");
+        return OkResponse("Project marked as done. Awaiting commission payment.");
     }
 
     [HttpPost("{id}/commission-payment/checkout")]
@@ -97,7 +96,7 @@ public class ProjectRequestsController (IMediator mediator) : ControllerBase
         [FromRoute] Guid id)
     {
         var result = await mediator.Send(new CreateProjectCommissionCheckoutCommand(id));
-        return Ok(result);
+        return OkResponse(result);
     }
 
     [HttpGet("{id}/commission-payment/verify")]
@@ -109,7 +108,7 @@ public class ProjectRequestsController (IMediator mediator) : ControllerBase
 
         var result = await mediator.Send(
             new VerifyProjectCommissionPaymentQuery(id), cancellationToken);
-        return Ok(result);
+        return OkResponse(result);
     }
 
 }

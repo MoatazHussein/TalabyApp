@@ -6,16 +6,15 @@ using Talaby.Application.Features.Projects.QuestionReplies.Commands.DeleteQuesti
 using Talaby.Application.Features.Projects.QuestionReplies.Commands.UpdateQuestionReply;
 namespace Talaby.API.Controllers.Projects;
 
-[ApiController]
 [Authorize]
 [Route("api/question-replies")]
-public class QuestionRepliesController(IMediator mediator) : ControllerBase
+public class QuestionRepliesController(IMediator mediator) : BaseApiController
 {
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateQuestionReplyCommand command)
     {
         var id = await mediator.Send(command);
-        return Ok("Created Successfully");
+        return OkResponse("Created Successfully");
     }
 
     [HttpPatch()]
@@ -23,7 +22,7 @@ public class QuestionRepliesController(IMediator mediator) : ControllerBase
     {
         await mediator.Send(command);
 
-        return StatusCode(200, $"Updated successfully");
+        return OkResponse("Updated successfully");
     }
 
 
@@ -32,7 +31,7 @@ public class QuestionRepliesController(IMediator mediator) : ControllerBase
     {
         await mediator.Send(new DeleteQuestionReplyCommand(id));
 
-        return StatusCode(200, $"Deleted successfully");
+        return OkResponse("Deleted successfully");
     }
 
 }

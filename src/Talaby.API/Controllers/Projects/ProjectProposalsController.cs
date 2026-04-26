@@ -8,16 +8,15 @@ using Talaby.Application.Features.Projects.ProjectProposals.Commands.UpdateProje
 using Talaby.Application.Features.Projects.ProposalReplies.Queries.RepliesByProposalId;
 namespace Talaby.API.Controllers.Projects;
 
-[ApiController]
 [Authorize]
 [Route("api/project-proposals")]
-public class ProjectProposalsController(IMediator mediator) : ControllerBase
+public class ProjectProposalsController(IMediator mediator) : BaseApiController
 {
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateProjectProposalCommand command)
     {
         var id = await mediator.Send(command);
-        return Ok("Created Successfully");
+        return OkResponse("Created Successfully");
     }
 
     [HttpPatch()]
@@ -25,7 +24,7 @@ public class ProjectProposalsController(IMediator mediator) : ControllerBase
     {
         await mediator.Send(command);
 
-        return StatusCode(200, $"Updated successfully");
+        return OkResponse("Updated successfully");
     }
 
     [HttpPatch("status")]
@@ -33,7 +32,7 @@ public class ProjectProposalsController(IMediator mediator) : ControllerBase
     {
         await mediator.Send(command);
 
-        return StatusCode(200, $"Updated successfully");
+        return OkResponse("Updated successfully");
     }
 
     [HttpDelete("{id}")]
@@ -41,14 +40,14 @@ public class ProjectProposalsController(IMediator mediator) : ControllerBase
     {
         await mediator.Send(new DeleteProjectProposalCommand(id));
 
-        return StatusCode(200, $"Deleted successfully");
+        return OkResponse("Deleted successfully");
     }
 
     [HttpGet("{id}/replies")]
     public async Task<IActionResult> GetReplies(Guid id, [FromQuery] int page = 1, [FromQuery] int pageSize = 5)
     {
         var result = await mediator.Send(new GetRepliesByProposalIdQuery(id, page, pageSize));
-        return Ok(result);
+        return OkResponse(result);
     }
 
 

@@ -6,16 +6,15 @@ using Talaby.Application.Features.Projects.ProposalReplies.Commands.DeletePropos
 using Talaby.Application.Features.Projects.ProposalReplies.Commands.UpdateProposalReply;
 namespace Talaby.API.Controllers.Projects;
 
-[ApiController]
 [Authorize]
 [Route("api/proposal-replies")]
-public class ProposalRepliesController(IMediator mediator) : ControllerBase
+public class ProposalRepliesController(IMediator mediator) : BaseApiController
 {
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateProposalReplyCommand command)
     {
         var id = await mediator.Send(command);
-        return Ok("Created Successfully");
+        return OkResponse("Created Successfully");
     }
 
     [HttpPatch()]
@@ -23,7 +22,7 @@ public class ProposalRepliesController(IMediator mediator) : ControllerBase
     {
         await mediator.Send(command);
 
-        return StatusCode(200, $"Updated successfully");
+        return OkResponse("Updated successfully");
     }
 
 
@@ -32,7 +31,7 @@ public class ProposalRepliesController(IMediator mediator) : ControllerBase
     {
         await mediator.Send(new DeleteProposalReplyCommand(id));
 
-        return StatusCode(200, $"Deleted successfully");
+        return OkResponse("Deleted successfully");
     }
 
 }

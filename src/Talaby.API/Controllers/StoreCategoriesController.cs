@@ -9,23 +9,22 @@ using Talaby.Domain.Entities;
 
 namespace Talaby.API.Controllers
 {
-    [ApiController]
     [Route("api/storeCategories")]
     //[Authorize]
-    public class StoreCategoriesController(IMediator mediator) : ControllerBase
+    public class StoreCategoriesController(IMediator mediator) : BaseApiController
     {
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StoreCategory>>> GetAll([FromQuery] GetAllStoreCategoriesQuery query)
         {
             var storeCategories = await mediator.Send(query);
-            return Ok(storeCategories);
+            return OkResponse(storeCategories);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<StoreCategory?>> GetById([FromRoute] int id)
         {
             var storeCategory = await mediator.Send(new GetStoreCategoryByIdQuery(id));
-            return Ok(storeCategory);
+            return OkResponse(storeCategory);
         }
 
         [HttpPost]
@@ -34,7 +33,7 @@ namespace Talaby.API.Controllers
         {
             int id = await mediator.Send(command);
 
-            return CreatedAtAction(nameof(GetById), new { id }, null);
+            return CreatedResponse(nameof(GetById), new { id }, id);
         }
 
 
@@ -45,8 +44,7 @@ namespace Talaby.API.Controllers
         {
             await mediator.Send(command);
 
-            //return NoContent();
-            return StatusCode(200,$"Updated successfully" );
+            return OkResponse("Updated successfully");
 
 
         }
@@ -58,8 +56,7 @@ namespace Talaby.API.Controllers
         {
             await mediator.Send(new DeleteStoreCategoryCommand(id));
 
-            //return NoContent();
-            return StatusCode(200, $"Deleted successfully");
+            return OkResponse("Deleted successfully");
 
         }
 

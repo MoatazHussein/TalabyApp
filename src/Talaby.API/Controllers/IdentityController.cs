@@ -16,9 +16,8 @@ using Talaby.Domain.Constants;
 
 namespace Talaby.API.Controllers;
 
-[ApiController]
 [Route("api/identity")]
-public class IdentityController(IMediator mediator, IConfiguration configuration) : ControllerBase
+public class IdentityController(IMediator mediator, IConfiguration configuration) : BaseApiController
 {
 
 
@@ -26,7 +25,7 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
     public async Task<IActionResult> GetUsers()
     {
         var result = await mediator.Send(new GetAllUsersQuery());
-        return Ok(result);
+        return OkResponse(result);
     }
 
     [Authorize]
@@ -35,7 +34,7 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
     public async Task<IActionResult> GetCurrentUser()
     {
         var result = await mediator.Send(new GetCurrentUserQuery(User));
-        return Ok(result);
+        return OkResponse(result);
     }
 
 
@@ -43,14 +42,14 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
     public async Task<IActionResult> RegisterClient(RegisterClientCommand command)
     {
         await mediator.Send(command);
-        return Ok("Client registered successfully.");
+        return OkResponse("Client registered successfully.");
     }
 
     [HttpPost("register/store")]
     public async Task<IActionResult> RegisterStore(RegisterStoreCommand command)
     {
         await mediator.Send(command);
-        return Ok("Store registered successfully.");
+        return OkResponse("Store registered successfully.");
     }
 
     [HttpPost("userRole")]
@@ -58,7 +57,7 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
     public async Task<IActionResult> AssignUserRole(AssignUserRoleCommand command)
     {
         await mediator.Send(command);
-        return NoContent();
+        return OkResponse("Done");
     }
 
     [HttpDelete("userRole")]
@@ -66,14 +65,14 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
     public async Task<IActionResult> UnassignedUserRole(UnassignUserRoleCommand command)
     {
         await mediator.Send(command);
-        return NoContent();
+        return OkResponse("Done");
     }
 
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommand command)
     {
         await mediator.Send(command);
-        return Ok("If an account exists with that email, a reset link was sent.");
+        return OkResponse("If an account exists with that email, a reset link was sent.");
     }
 
     [HttpPost("reset-password")]
@@ -81,16 +80,16 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
     {
         var success = await mediator.Send(command);
         if (!success)
-            return BadRequest("Invalid token or user not found.");
+            return BadRequestResponse("Invalid token or user not found.");
 
-        return Ok("Password has been reset successfully.");
+        return OkResponse("Password has been reset successfully.");
     }
 
     [HttpGet("reset-password")]
     public IActionResult ShowResetPasswordPage([FromQuery] string email, [FromQuery] string token)
     {
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
-            return BadRequest("Email confirmation failed.");
+            return BadRequestResponse("Email confirmation failed.");
 
 
         return Redirect($"{configuration["App:FrontendBaseUrl"]}/reset-password?email={Uri.EscapeDataString(email)}&token={Uri.EscapeDataString(token)}");
@@ -102,7 +101,7 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
     public async Task<IActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token)
     {
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
-            return BadRequest("Invalid email or token.");
+            return BadRequestResponse("Invalid email or token.");
 
         var command = new ConfirmEmailCommand
         {
@@ -113,9 +112,8 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
         var result = await mediator.Send(command);
 
         if (!result)
-            return BadRequest("Email confirmation failed.");
+            return BadRequestResponse("Email confirmation failed.");
 
-        //return Ok("Email confirmed successfully.");
         return Redirect($"{configuration["App:FrontendBaseUrl"]}/successful_verification?email={email}&token={token}");
     }
 
@@ -124,7 +122,7 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
     public async Task<IActionResult> Login([FromBody] LoginCommand command)
     {
         var result = await mediator.Send(command);
-        return Ok(result);
+        return OkResponse(result);
     }
 
 
@@ -134,10 +132,9 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
         var result = await mediator.Send(command);
 
         if (!result)
-            return BadRequest("Update User Data Failed");
+            return BadRequestResponse("Update User Data Failed");
 
-        //return NoContent();
-        return StatusCode(200, $"User Updated successfully");
+        return OkResponse("User Updated successfully");
     }
 
 

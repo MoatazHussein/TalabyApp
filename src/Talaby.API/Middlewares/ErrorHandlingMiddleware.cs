@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Talaby.Application.Common;
 using Talaby.Domain.Exceptions;
 
 namespace Talaby.API.Middlewares;
@@ -13,39 +14,29 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
         }
         catch (NotFoundException notFound)
         {
-            context.Response.StatusCode = 404;
-            await context.Response.WriteAsync(notFound.Message);
-
             logger.LogWarning(notFound.Message);
+            await WriteErrorAsync(context, 404, notFound.Message);
         }
         catch (UnAuthorizedAccessException unAuthorizedAccess)
         {
-            context.Response.StatusCode = 401;
-            await context.Response.WriteAsync(unAuthorizedAccess.Message);
+            await WriteErrorAsync(context, 401, unAuthorizedAccess.Message);
         }
         catch (AlreadyExistsException alreadyExists)
         {
-            context.Response.StatusCode = 409;
-            await context.Response.WriteAsync(alreadyExists.Message);
+            await WriteErrorAsync(context, 409, alreadyExists.Message);
         }
         catch (AppException ex)
         {
-            context.Response.StatusCode = 500;
-            await context.Response.WriteAsync(ex.Message);
+            await WriteErrorAsync(context, 500, ex.Message);
         }
         catch (DbUpdateException)
         {
-            context.Response.StatusCode = 500;
-            await context.Response.WriteAsync("Database update failed");
+            await WriteErrorAsync(context, 500, "Database update failed");
         }
         catch (PaymentGatewayException ex)
         {
-            logger.LogWarning(ex,
-                "Payment gateway error. Path={Path}",
-                context.Request.Path);
-
-            context.Response.StatusCode = 502;
-            await context.Response.WriteAsync("Payment gateway error. Please try again later.");
+            logger.LogWarning(ex, "Payment gateway error. Path={Path}", context.Request.Path);
+            await WriteErrorAsync(context, 502, "Payment gateway error. Please try again later.");
         }
         catch (BusinessRuleException ex)
         {
@@ -56,8 +47,7 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
                     ex.StatusCode, context.Request.Path);
             }
 
-            context.Response.StatusCode = ex.StatusCode;
-            await context.Response.WriteAsync(ex.Message);
+            await WriteErrorAsync(context, ex.StatusCode, ex.Message, ex.ErrorCode);
         }
         catch (Exception ex)
         {
@@ -65,8 +55,13 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
                 "Unhandled exception. Path={Path}, Method={Method}",
                 context.Request.Path, context.Request.Method);
 
-            context.Response.StatusCode = 500;
-            await context.Response.WriteAsync("Something went wrong");
+            await WriteErrorAsync(context, 500, "Something went wrong");
         }
+    }
+
+    private static Task WriteErrorAsync(HttpContext context, int statusCode, string message, string? errorCode = null)
+    {
+        context.Response.StatusCode = statusCode;
+        return context.Response.WriteAsJsonAsync(ApiResponse.Fail(message, errorCode));
     }
 }

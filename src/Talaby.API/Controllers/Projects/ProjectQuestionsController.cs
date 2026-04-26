@@ -7,16 +7,15 @@ using Talaby.Application.Features.Projects.ProjectQuestions.Commands.UpdateProje
 using Talaby.Application.Features.Projects.QuestionReplies.Queries.RepliesByQuestionId;
 namespace Talaby.API.Controllers.Projects;
 
-[ApiController]
 [Authorize]
 [Route("api/project-questions")]
-public class ProjectQuestionsController(IMediator mediator) : ControllerBase
+public class ProjectQuestionsController(IMediator mediator) : BaseApiController
 {
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateProjectQuestionCommand command)
     {
         var id = await mediator.Send(command);
-        return Ok("Created Successfully");
+        return OkResponse("Created Successfully");
     }
 
     [HttpPatch()]
@@ -24,7 +23,7 @@ public class ProjectQuestionsController(IMediator mediator) : ControllerBase
     {
         await mediator.Send(command);
 
-        return StatusCode(200, $"Updated successfully");
+        return OkResponse("Updated successfully");
     }
 
 
@@ -33,14 +32,14 @@ public class ProjectQuestionsController(IMediator mediator) : ControllerBase
     {
         await mediator.Send(new DeleteProjectQuestionCommand(id));
 
-        return StatusCode(200, $"Deleted successfully");
+        return OkResponse("Deleted successfully");
     }
 
     [HttpGet("{id}/replies")]
     public async Task<IActionResult> GetReplies(Guid id, [FromQuery] int page = 1, [FromQuery] int pageSize = 5)
     {
         var result = await mediator.Send(new GetRepliesByQuestionIdQuery(id, page, pageSize));
-        return Ok(result);
+        return OkResponse(result);
     }
 
 
