@@ -57,7 +57,7 @@ public class RegisterStoreCommandHandler(UserManager<AppUser> userManager, IStor
 
         var result = await userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)
-            throw new ApplicationException(string.Join(", ", result.Errors.Select(e => e.Description)));
+            throw new AppException(string.Join(", ", result.Errors.Select(e => e.Description)));
 
         await userManager.AddToRoleAsync(user, UserRoles.Store);
 

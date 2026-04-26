@@ -1,17 +1,39 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using Talaby.Application.Features.Users;
 using Talaby.Domain.Entities.Projects;
+using Talaby.Domain.Enums;
+using Talaby.Domain.Exceptions;
 using Talaby.Domain.Repositories.Projects;
 
 namespace Talaby.Application.Features.Projects.ProjectRequests.Commands.CreateProjectRequest;
 
-public class CreateProjectRequestCommandHandler(IProjectRequestRepository repository, IUserContext userContext) : IRequestHandler<CreateProjectRequestCommand, Guid>
+public class CreateProjectRequestCommandHandler(
+    IProjectRequestRepository repository,
+    IUserContext userContext,
+    ILogger<CreateProjectRequestCommandHandler> logger)
+    : IRequestHandler<CreateProjectRequestCommand, Guid>
 {
-    private readonly IProjectRequestRepository _repository = repository;
-    private readonly IUserContext _userContext = userContext;
-
     public async Task<Guid> Handle(CreateProjectRequestCommand request, CancellationToken cancellationToken)
     {
+        var currentUser = userContext.GetCurrentUser();
+
+        // Block creation if the client has an unpaid project awaiting commission payment.
+        var hasUnpaidProject = await repository.AnyAsync(
+            r => r.CreatorId == currentUser.Id
+                 && r.Status == ProjectRequestStatus.AwaitingCommissionPayment,
+            cancellationToken);
+
+        if (hasUnpaidProject)
+        {
+            logger.LogWarning(
+                "Project request creation blocked. UserId={UserId} has an unpaid commission payment.",
+                currentUser.Id);
+
+            throw new BusinessRuleException(
+                "You have a project awaiting commission payment. Please complete the payment before creating a new request.",
+                409);
+        }
 
         var entity = new ProjectRequest
         {
@@ -21,11 +43,12 @@ public class CreateProjectRequestCommandHandler(IProjectRequestRepository reposi
             MinBudget = request.MinBudget,
             MaxBudget = request.MaxBudget,
             StoreCategoryId = request.StoreCategoryId,
-            CreatorId = _userContext.GetCurrentUser().Id,
+            CreatorId = currentUser.Id,
             CreatedAt = DateTime.UtcNow
         };
 
-        await _repository.Create(entity);
+        await repository.Create(entity);
+
         return entity.Id;
     }
 }

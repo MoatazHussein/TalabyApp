@@ -43,4 +43,12 @@ public class ProjectProposal
             throw new InvalidOperationException("Cannot cancel an already-rejected proposal.");
         Status = ProjectProposalStatus.Cancelled;
     }
+
+    public void Complete()
+    {
+        if (Status == ProjectProposalStatus.Completed) return;
+        if (Status != ProjectProposalStatus.Accepted)
+            throw new InvalidOperationException($"Cannot complete a proposal with status {Status}.");
+        Status = ProjectProposalStatus.Completed;
+    }
 }

@@ -18,6 +18,11 @@ public class RegisterClientCommandHandlerValidator : AbstractValidator<RegisterC
         .EmailAddress()
         .WithMessage("Please provide a valid email address");
 
-
+        RuleFor(dto => dto.Password)
+            .NotEmpty().WithMessage("Please provide a Password")
+            .MinimumLength(8).WithMessage("Password must be at least 8 characters")
+            .Matches(@"[A-Z]").WithMessage("Passwords must have at least one uppercase ('A'-'Z').")
+            .Matches(@"[0-9]").WithMessage("Passwords must have at least one digit ('0'-'9').")
+            .Matches(@"[^a-zA-Z0-9]").WithMessage("Passwords must have at least one non alphanumeric character.");
     }
 }
