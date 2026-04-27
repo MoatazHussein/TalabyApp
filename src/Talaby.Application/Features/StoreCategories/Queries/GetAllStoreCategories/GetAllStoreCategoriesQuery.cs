@@ -8,8 +8,8 @@ namespace Talaby.Application.Features.StoreCategories.Queries.GetAllStoreCategor
 public class GetAllStoreCategoriesQuery : IRequest<PagedResult<StoreCategory>>
 {
     public string? SearchPhrase { get; set; }
-    public int PageNumber { get; set; }
-    public int PageSize { get; set; }
+    public int PageNumber { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
     public string? SortBy { get; set; }
-    public SortDirection SortDirection { get; set; }
+    public SortDirection? SortDirection { get; set; }
 }

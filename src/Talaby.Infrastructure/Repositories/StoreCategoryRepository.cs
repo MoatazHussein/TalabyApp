@@ -34,7 +34,7 @@ internal class StoreCategoryRepository(TalabyDbContext dbContext)
         int pageSize,
         int pageNumber,
         string? sortBy,
-        SortDirection sortDirection)
+        SortDirection? sortDirection)
     {
         var searchPhraseLower = searchPhrase?.ToLower();
 
@@ -45,20 +45,20 @@ internal class StoreCategoryRepository(TalabyDbContext dbContext)
 
         var totalCount = await baseQuery.CountAsync();
 
-        if (sortBy != null)
+        var columnsSelector = new Dictionary<string, Expression<Func<StoreCategory, object>>>
         {
-            var columnsSelector = new Dictionary<string, Expression<Func<StoreCategory, object>>>
-            {
-                { nameof(StoreCategory.NameAr), r => r.NameAr },
-                { nameof(StoreCategory.NameEn), r => r.NameEn },
-            };
+            { nameof(StoreCategory.NameAr), r => r.NameAr },
+            { nameof(StoreCategory.NameEn), r => r.NameEn },
+        };
 
-            var selectedColumn = columnsSelector[sortBy];
+        var sortColumn = sortBy ?? nameof(StoreCategory.NameAr);
+        var selectedColumn = columnsSelector.GetValueOrDefault(
+            sortColumn,
+            columnsSelector[nameof(StoreCategory.NameAr)]);
 
-            baseQuery = sortDirection == SortDirection.Ascending
-                ? baseQuery.OrderBy(selectedColumn)
-                : baseQuery.OrderByDescending(selectedColumn);
-        }
+        baseQuery = (sortDirection ?? SortDirection.Descending) == SortDirection.Ascending
+            ? baseQuery.OrderBy(selectedColumn).ThenBy(r => r.Id)
+            : baseQuery.OrderByDescending(selectedColumn).ThenByDescending(r => r.Id);
 
         var StoreCategories = await baseQuery
             .Skip(pageSize * (pageNumber - 1))

@@ -16,6 +16,8 @@ public class GetQuestionsByProjectRequestIdHandler(IProjectQuestionReadRepositor
             request.ProjectRequestId,
             request.PageNumber,
             request.PageSize,
+            request.SortBy,
+            request.SortDirection,
             cancellationToken);
 
         foreach (var reply in result.Items)

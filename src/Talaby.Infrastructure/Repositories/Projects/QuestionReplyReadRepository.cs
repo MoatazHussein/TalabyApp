@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using Talaby.Application.Common;
 using Talaby.Application.Features.Projects.Dtos;
 using Talaby.Application.Features.Projects.QuestionReplies.Queries.RepliesByQuestionId;
+using Talaby.Domain.Constants;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Exceptions;
 using Talaby.Infrastructure.Persistence;
@@ -11,10 +13,12 @@ namespace Talaby.Infrastructure.Repositories.Projects;
 public class QuestionReplyReadRepository(TalabyDbContext context) : IQuestionReplyReadRepository
 {
     public async Task<QuestionWithRepliesDto> GetQuestionWithRepliesAsync(
-    Guid questionId,
-    int pageNumber,
-    int pageSize,
-    CancellationToken cancellationToken)
+        Guid questionId,
+        int pageNumber,
+        int pageSize,
+        string? sortBy,
+        SortDirection? sortDirection,
+        CancellationToken cancellationToken)
     {
         var question = await context.ProjectQuestions
             .Where(q => q.Id == questionId)
@@ -26,14 +30,28 @@ public class QuestionReplyReadRepository(TalabyDbContext context) : IQuestionRep
             .FirstOrDefaultAsync(cancellationToken);
 
         if (question == null)
-        throw new NotFoundException(nameof(ProjectQuestion), questionId.ToString());
-
+        {
+            throw new NotFoundException(nameof(ProjectQuestion), questionId.ToString());
+        }
 
         var query = context.QuestionReplies
-            .Where(r => r.ProjectQuestionId == questionId)
-            .OrderBy(r => r.CreatedAt);
+            .Where(r => r.ProjectQuestionId == questionId);
 
         var totalCount = await query.CountAsync(cancellationToken);
+
+        var columnsSelector = new Dictionary<string, Expression<Func<QuestionReply, object>>>
+        {
+            { nameof(QuestionReply.CreatedAt), r => r.CreatedAt },
+        };
+
+        var sortColumn = sortBy ?? nameof(QuestionReply.CreatedAt);
+        var selectedColumn = columnsSelector.GetValueOrDefault(
+            sortColumn,
+            columnsSelector[nameof(QuestionReply.CreatedAt)]);
+
+        query = (sortDirection ?? SortDirection.Descending) == SortDirection.Ascending
+            ? query.OrderBy(selectedColumn).ThenBy(r => r.Id)
+            : query.OrderByDescending(selectedColumn).ThenByDescending(r => r.Id);
 
         var items = await query
             .Skip((pageNumber - 1) * pageSize)
@@ -54,6 +72,5 @@ public class QuestionReplyReadRepository(TalabyDbContext context) : IQuestionRep
             QuestionContent = question.Content,
             Replies = new PagedResult<QuestionReplyDto>(items, totalCount, pageSize, pageNumber)
         };
-
     }
 }

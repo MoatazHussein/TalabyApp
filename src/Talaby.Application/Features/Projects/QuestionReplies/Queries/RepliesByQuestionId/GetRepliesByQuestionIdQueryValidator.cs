@@ -1,19 +1,16 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Talaby.Domain.Entities.Projects;
 
-namespace Talaby.Application.Features.Projects.ProjectRequests.Queries.GetAllProjectRequests;
+namespace Talaby.Application.Features.Projects.QuestionReplies.Queries.RepliesByQuestionId;
 
-public class GetAllProjectRequestsQueryHandlerValidator : AbstractValidator<GetAllProjectRequestsQuery>
+public class GetRepliesByQuestionIdQueryValidator : AbstractValidator<GetRepliesByQuestionIdQuery>
 {
     private readonly string[] allowedSortByColumnNames =
     [
-        nameof(ProjectRequest.CreatedAt),
-        nameof(ProjectRequest.Title),
-        nameof(ProjectRequest.Description)
+        nameof(QuestionReply.CreatedAt)
     ];
 
-
-    public GetAllProjectRequestsQueryHandlerValidator()
+    public GetRepliesByQuestionIdQueryValidator()
     {
         RuleFor(r => r.PageNumber)
             .GreaterThan(0);

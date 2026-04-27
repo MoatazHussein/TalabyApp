@@ -1,4 +1,6 @@
-﻿namespace Talaby.Application.Features.Projects.ProjectRequests.Queries.Dtos;
+using Talaby.Domain.Enums;
+
+namespace Talaby.Application.Features.Projects.ProjectRequests.Queries.Dtos;
 
 public class ProjectRequestDto
 {
@@ -11,8 +13,5 @@ public class ProjectRequestDto
     public int StoreCategoryId { get; set; }
     public Guid CreatorId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public int StatusValue { get; set; }
-    public string StatusName { get; set; } = default!;
-
+    public ProjectRequestStatus Status { get; set; }
 }
-

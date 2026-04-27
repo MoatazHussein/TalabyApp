@@ -11,9 +11,7 @@ public class ProjectRequestMappingProfile : Profile
 {
     public ProjectRequestMappingProfile()
     {
-        CreateMap<ProjectRequest, ProjectRequestDto>()
-            .ForMember(dest => dest.StatusValue, opt => opt.MapFrom(src => (int)src.Status))
-            .ForMember(dest => dest.StatusName, opt => opt.MapFrom(src => src.Status.ToString()));
+        CreateMap<ProjectRequest, ProjectRequestDto>();
 
         CreateMap<UpdateProjectRequestCommand, ProjectRequest>();
 

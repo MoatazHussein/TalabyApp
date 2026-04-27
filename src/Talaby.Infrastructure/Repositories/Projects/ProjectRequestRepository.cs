@@ -41,7 +41,7 @@ public class ProjectRequestRepository(TalabyDbContext dbContext)
         int pageSize,
         int pageNumber,
         string? sortBy,
-        SortDirection sortDirection)
+        SortDirection? sortDirection)
     {
         var searchPhraseLower = searchPhrase?.ToLower();
 
@@ -57,20 +57,21 @@ public class ProjectRequestRepository(TalabyDbContext dbContext)
 
         var totalCount = await baseQuery.CountAsync();
 
-        if (sortBy != null)
+        var columnsSelector = new Dictionary<string, Expression<Func<ProjectRequest, object>>>
         {
-            var columnsSelector = new Dictionary<string, Expression<Func<ProjectRequest, object>>>
-            {
-                { nameof(ProjectRequest.Title), r => r.Title },
-                { nameof(ProjectRequest.Description), r => r.Description },
-            };
+            { nameof(ProjectRequest.CreatedAt), r => r.CreatedAt },
+            { nameof(ProjectRequest.Title), r => r.Title },
+            { nameof(ProjectRequest.Description), r => r.Description },
+        };
 
-            var selectedColumn = columnsSelector[sortBy];
+        var sortColumn = sortBy ?? nameof(ProjectRequest.CreatedAt);
+        var selectedColumn = columnsSelector.GetValueOrDefault(
+            sortColumn,
+            columnsSelector[nameof(ProjectRequest.CreatedAt)]);
 
-            baseQuery = sortDirection == SortDirection.Ascending
-                ? baseQuery.OrderBy(selectedColumn)
-                : baseQuery.OrderByDescending(selectedColumn);
-        }
+        baseQuery = (sortDirection ?? SortDirection.Descending) == SortDirection.Ascending
+            ? baseQuery.OrderBy(selectedColumn).ThenBy(r => r.Id)
+            : baseQuery.OrderByDescending(selectedColumn).ThenByDescending(r => r.Id);
 
         var projectRequests = await baseQuery
             .Skip(pageSize * (pageNumber - 1))

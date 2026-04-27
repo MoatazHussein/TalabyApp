@@ -5,6 +5,7 @@ using Talaby.Application.Features.Projects.ProjectQuestions.Commands.CreateProje
 using Talaby.Application.Features.Projects.ProjectQuestions.Commands.DeleteProjectQuestion;
 using Talaby.Application.Features.Projects.ProjectQuestions.Commands.UpdateProjectQuestion;
 using Talaby.Application.Features.Projects.QuestionReplies.Queries.RepliesByQuestionId;
+using Talaby.Domain.Constants;
 namespace Talaby.API.Controllers.Projects;
 
 [Authorize]
@@ -36,9 +37,19 @@ public class ProjectQuestionsController(IMediator mediator) : BaseApiController
     }
 
     [HttpGet("{id}/replies")]
-    public async Task<IActionResult> GetReplies(Guid id, [FromQuery] int page = 1, [FromQuery] int pageSize = 5)
+    public async Task<IActionResult> GetReplies(
+        Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 5,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] SortDirection? sortDirection = null)
     {
-        var result = await mediator.Send(new GetRepliesByQuestionIdQuery(id, page, pageSize));
+        var result = await mediator.Send(new GetRepliesByQuestionIdQuery(
+            id,
+            page,
+            pageSize,
+            sortBy,
+            sortDirection));
         return OkResponse(result);
     }
 

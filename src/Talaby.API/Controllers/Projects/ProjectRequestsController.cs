@@ -57,9 +57,19 @@ public class ProjectRequestsController(IMediator mediator) : BaseApiController
 
 
     [HttpGet("{id}/questions")]
-    public async Task<IActionResult> GetQuestions(Guid id, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetQuestions(
+        Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] SortDirection? sortDirection = null)
     {
-        var result = await mediator.Send(new GetQuestionsByProjectRequestIdQuery(id, page, pageSize));
+        var result = await mediator.Send(new GetQuestionsByProjectRequestIdQuery(
+            id,
+            page,
+            pageSize,
+            sortBy,
+            sortDirection));
         return OkResponse(result);
     }
 

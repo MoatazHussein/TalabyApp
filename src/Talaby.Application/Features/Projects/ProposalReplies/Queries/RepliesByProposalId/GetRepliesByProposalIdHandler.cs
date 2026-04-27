@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Projects.Dtos;
 
@@ -13,10 +13,12 @@ public class GetRepliesByProposalIdHandler(IProposalReplyReadRepository reposito
         CancellationToken cancellationToken)
     {
         var result = await repository.GetProposalWithRepliesAsync(
-      request.ProposalId,
-      request.PageNumber,
-      request.PageSize,
-      cancellationToken);
+            request.ProposalId,
+            request.PageNumber,
+            request.PageSize,
+            request.SortBy,
+            request.SortDirection,
+            cancellationToken);
 
         foreach (var reply in result.Replies.Items)
         {
