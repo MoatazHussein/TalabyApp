@@ -26,6 +26,9 @@ using Talaby.Infrastructure.Services.Email;
 using Talaby.Infrastructure.Services.Identity;
 using Talaby.Infrastructure.Services.TimeConversion;
 using Talaby.Infrastructure.Services.UnitOfWork;
+using Talaby.Application.Features.Dashboard.Queries.Admin;
+using Talaby.Application.Features.Dashboard.Queries.Client;
+using Talaby.Application.Features.Dashboard.Queries.Store;
 
 namespace Talaby.Infrastructure.Extensions;
 public static class ServiceCollectionExtensions
@@ -61,6 +64,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQuestionReplyReadRepository, QuestionReplyReadRepository>();
 
         services.AddScoped<IProjectCommissionPaymentRepository, ProjectCommissionPaymentRepository>();
+        services.AddScoped<IAdminDashboardReadRepository, DashboardReadRepository>();
+        services.AddScoped<IClientDashboardReadRepository, DashboardReadRepository>();
+        services.AddScoped<IStoreDashboardReadRepository, DashboardReadRepository>();
 
         // Tap HTTP client — auth header is set once at registration time from config.
         // TapPaymentService uses IHttpClientFactory to get a pre-configured client.
