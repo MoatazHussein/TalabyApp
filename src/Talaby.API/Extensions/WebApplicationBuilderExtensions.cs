@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
-using Talaby.API.Middlewares;
-using Talaby.Application.Common;
-using Serilog;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Serilog;
+using Talaby.API.Middlewares;
 
 namespace Talaby.API.Extensions;
 
@@ -17,19 +15,6 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddControllers()
                         .AddJsonOptions(opts => opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-        builder.Services.Configure<ApiBehaviorOptions>(options =>
-        {
-            options.InvalidModelStateResponseFactory = ctx =>
-            {
-                var errors = ctx.ModelState
-                    .Where(e => e.Value?.Errors.Count > 0)
-                    .SelectMany(e => e.Value!.Errors.Select(x => new FieldError(e.Key, x.ErrorMessage)))
-                    .ToList();
-
-                var response = ApiResponse.Fail("Validation failed", errorCode: "VALIDATION_ERROR", errors: errors);
-                return new ObjectResult(response) { StatusCode = 400 };
-            };
-        });
         builder.Services.AddSwaggerGen(c =>
         {
             c.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme

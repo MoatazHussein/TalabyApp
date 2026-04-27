@@ -18,6 +18,8 @@ public class GetProposalsByProjectRequestIdHandler(IProjectProposalReadRepositor
             request.ProjectRequestId,
             request.PageNumber,
             request.PageSize,
+            request.SortBy,
+            request.SortDirection,
             cancellationToken);
 
 

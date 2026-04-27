@@ -1,8 +1,9 @@
-﻿using FluentValidation;
-using FluentValidation.AspNetCore;
+using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Talaby.Application.Common;
+using Talaby.Application.Common.Behaviors;
 using Talaby.Application.Features.Users;
 
 namespace Talaby.Application.Extensions;
@@ -15,11 +16,11 @@ public static class ServiceCollectionExtensions
         var applicationAssembly = typeof(ServiceCollectionExtensions).Assembly;
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(applicationAssembly));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
         services.AddAutoMapper(applicationAssembly);
 
-        services.AddValidatorsFromAssembly(applicationAssembly)
-           .AddFluentValidationAutoValidation();
+        services.AddValidatorsFromAssembly(applicationAssembly);
 
         services.AddScoped<IUserContext, UserContext>();
         services.AddHttpContextAccessor();

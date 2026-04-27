@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Talaby.Application.Common;
 using Talaby.Domain.Exceptions;
 
@@ -49,6 +50,14 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
 
             await WriteErrorAsync(context, ex.StatusCode, ex.Message, ex.ErrorCode);
         }
+        catch (ValidationException ex)
+        {
+            var errors = ex.Errors
+                .Select(error => new FieldError(error.PropertyName, error.ErrorMessage))
+                .ToList();
+
+            await WriteErrorAsync(context, 400, "Validation failed", "VALIDATION_ERROR", errors);
+        }
         catch (Exception ex)
         {
             logger.LogError(ex,
@@ -59,9 +68,14 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
         }
     }
 
-    private static Task WriteErrorAsync(HttpContext context, int statusCode, string message, string? errorCode = null)
+    private static Task WriteErrorAsync(
+        HttpContext context,
+        int statusCode,
+        string message,
+        string? errorCode = null,
+        IReadOnlyList<FieldError>? errors = null)
     {
         context.Response.StatusCode = statusCode;
-        return context.Response.WriteAsJsonAsync(ApiResponse.Fail(message, errorCode));
+        return context.Response.WriteAsJsonAsync(ApiResponse.Fail(message, errorCode, errors));
     }
 }

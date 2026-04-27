@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Talaby.Application.Features.Payments.Commands.CreateProjectCommissionCheckout;
@@ -14,6 +14,7 @@ using Talaby.Application.Features.Projects.ProjectRequests.Commands.UpdateProjec
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.Dtos;
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetAllProjectRequests;
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetProjectRequestById;
+using Talaby.Domain.Constants;
 
 namespace Talaby.API.Controllers.Projects;
 
@@ -37,9 +38,20 @@ public class ProjectRequestsController(IMediator mediator) : BaseApiController
     }
 
     [HttpGet("{id}/proposals")]
-    public async Task<IActionResult> GetProposals(Guid id, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetProposals(
+        Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] SortDirection? sortDirection = null)
     {
-        var result = await mediator.Send(new GetProposalsByProjectRequestIdQuery(id, page, pageSize));
+        var query = new GetProposalsByProjectRequestIdQuery(
+            id,
+            page,
+            pageSize,
+            sortBy,
+            sortDirection);
+        var result = await mediator.Send(query);
         return OkResponse(result);
     }
 
@@ -112,4 +124,3 @@ public class ProjectRequestsController(IMediator mediator) : BaseApiController
     }
 
 }
-
