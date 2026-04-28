@@ -7,6 +7,7 @@ using Talaby.Application.Features.Users.Commands.ForgotPassword;
 using Talaby.Application.Features.Users.Commands.Login;
 using Talaby.Application.Features.Users.Commands.RegisterClient;
 using Talaby.Application.Features.Users.Commands.RegisterStore;
+using Talaby.Application.Features.Users.Commands.ResendEmailConfirmation;
 using Talaby.Application.Features.Users.Commands.ResetPassword;
 using Talaby.Application.Features.Users.Commands.UnassignUserRole;
 using Talaby.Application.Features.Users.Commands.UpdateUser;
@@ -73,6 +74,13 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
     {
         await mediator.Send(command);
         return OkResponse("If an account exists with that email, a reset link was sent.");
+    }
+
+    [HttpPost("confirm-email/resend")]
+    public async Task<IActionResult> ResendEmailConfirmation([FromBody] ResendEmailConfirmationCommand command)
+    {
+        await mediator.Send(command);
+        return OkResponse("If an account exists and is not confirmed, a confirmation email was sent.");
     }
 
     [HttpPost("reset-password")]

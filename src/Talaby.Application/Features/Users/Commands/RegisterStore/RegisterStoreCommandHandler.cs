@@ -1,8 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Talaby.Application.Common.Interfaces;
+using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Constants;
 using Talaby.Domain.Entities;
 using Talaby.Domain.Enums;
@@ -11,8 +10,10 @@ using Talaby.Domain.Repositories;
 
 namespace Talaby.Application.Features.Users.Commands.RegisterStore;
 
-public class RegisterStoreCommandHandler(UserManager<AppUser> userManager, IStoreCategoryRepository storeCategoryRepository, IMailService mailService
-    , IConfiguration config) : IRequestHandler<RegisterStoreCommand, Guid>
+public class RegisterStoreCommandHandler(
+    UserManager<AppUser> userManager,
+    IStoreCategoryRepository storeCategoryRepository,
+    IEmailConfirmationService emailConfirmationService) : IRequestHandler<RegisterStoreCommand, Guid>
 {
     public async Task<Guid> Handle(RegisterStoreCommand request, CancellationToken cancellationToken)
     {
@@ -61,13 +62,7 @@ public class RegisterStoreCommandHandler(UserManager<AppUser> userManager, IStor
 
         await userManager.AddToRoleAsync(user, UserRoles.Store);
 
-        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-
-        var confirmUrl = $"{config["App:ConfirmEmailApiUrl"]}?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(token)}";
-
-        var emailBody = $"<p>Please confirm your email by clicking <a href='{confirmUrl}'>here</a>.</p>";
-
-        await mailService.SendEmailAsync(user.Email, "Confirm your email", emailBody, null);
+        await emailConfirmationService.SendConfirmationEmailAsync(user, cancellationToken);
 
 
 

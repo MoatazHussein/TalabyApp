@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IUserContext, UserContext>();
         services.AddScoped<IUserConfirmationGuard, UserConfirmationGuard>();
+        services.AddScoped<IEmailConfirmationService, EmailConfirmationService>();
         services.AddHttpContextAccessor();
 
         services.AddOptions<TapCheckoutOptions>()
