@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Talaby.Application.Features.Users;
+using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Repositories.Projects;
 
@@ -7,10 +7,13 @@ namespace Talaby.Application.Features.Projects.ProjectQuestions.Commands.CreateP
 
 public class CreateProjectQuestionCommandHandler(
     IProjectQuestionRepository repository,
-    IUserContext userContext) : IRequestHandler<CreateProjectQuestionCommand, Guid>
+    IUserContext userContext,
+    IUserConfirmationGuard userConfirmationGuard) : IRequestHandler<CreateProjectQuestionCommand, Guid>
 {
     public async Task<Guid> Handle(CreateProjectQuestionCommand request, CancellationToken cancellationToken)
     {
+        await userConfirmationGuard.EnsureCurrentUserEmailConfirmedAsync(cancellationToken);
+
         var question = new ProjectQuestion
         {
             Id = Guid.NewGuid(),

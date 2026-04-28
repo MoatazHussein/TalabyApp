@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Talaby.Application.Common;
 using Talaby.Application.Common.Interfaces;
-using Talaby.Application.Features.Users;
+using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities;
 using Talaby.Domain.Entities.Payments;
 using Talaby.Domain.Entities.Projects;

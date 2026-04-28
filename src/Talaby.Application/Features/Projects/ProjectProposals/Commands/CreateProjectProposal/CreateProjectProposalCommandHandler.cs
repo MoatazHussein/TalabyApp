@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Talaby.Application.Features.Users;
+using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Repositories.Projects;
 
@@ -7,10 +7,13 @@ namespace Talaby.Application.Features.Projects.ProjectProposals.Commands.CreateP
 
 public class CreateProjectProposalCommandHandler(
     IProjectProposalRepository repository,
-    IUserContext userContext) : IRequestHandler<CreateProjectProposalCommand, Guid>
+    IUserContext userContext,
+    IUserConfirmationGuard userConfirmationGuard) : IRequestHandler<CreateProjectProposalCommand, Guid>
 {
     public async Task<Guid> Handle(CreateProjectProposalCommand request, CancellationToken cancellationToken)
     {
+        await userConfirmationGuard.EnsureCurrentUserEmailConfirmedAsync(cancellationToken);
+
         var proposal = new ProjectProposal
         {
             Id = Guid.NewGuid(),

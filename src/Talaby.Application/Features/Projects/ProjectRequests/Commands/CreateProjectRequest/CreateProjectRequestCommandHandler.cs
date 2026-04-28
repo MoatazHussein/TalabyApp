@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using Talaby.Application.Features.Users;
+using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Enums;
 using Talaby.Domain.Exceptions;
@@ -11,11 +11,14 @@ namespace Talaby.Application.Features.Projects.ProjectRequests.Commands.CreatePr
 public class CreateProjectRequestCommandHandler(
     IProjectRequestRepository repository,
     IUserContext userContext,
+    IUserConfirmationGuard userConfirmationGuard,
     ILogger<CreateProjectRequestCommandHandler> logger)
     : IRequestHandler<CreateProjectRequestCommand, Guid>
 {
     public async Task<Guid> Handle(CreateProjectRequestCommand request, CancellationToken cancellationToken)
     {
+        await userConfirmationGuard.EnsureCurrentUserEmailConfirmedAsync(cancellationToken);
+
         var currentUser = userContext.GetCurrentUser();
 
         // Block creation if the client has an unpaid project awaiting commission payment.

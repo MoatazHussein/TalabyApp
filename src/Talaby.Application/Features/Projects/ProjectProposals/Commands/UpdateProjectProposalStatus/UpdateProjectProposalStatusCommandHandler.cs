@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using Talaby.Application.Common.Interfaces;
-using Talaby.Application.Features.Users;
+using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Enums;
 using Talaby.Domain.Exceptions;

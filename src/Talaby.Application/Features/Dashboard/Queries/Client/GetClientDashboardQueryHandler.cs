@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Talaby.Application.Features.Users;
+using Talaby.Application.Features.Users.Services;
 
 namespace Talaby.Application.Features.Dashboard.Queries.Client;
 

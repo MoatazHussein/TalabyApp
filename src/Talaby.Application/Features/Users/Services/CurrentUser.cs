@@ -1,4 +1,4 @@
-﻿namespace Talaby.Application.Features.Users;
+namespace Talaby.Application.Features.Users.Services;
 
 public record CurrentUser(Guid Id,
     string Email,

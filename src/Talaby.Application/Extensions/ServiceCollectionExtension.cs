@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Talaby.Application.Common;
 using Talaby.Application.Common.Behaviors;
-using Talaby.Application.Features.Users;
+using Talaby.Application.Features.Users.Services;
 
 namespace Talaby.Application.Extensions;
 
@@ -23,6 +23,7 @@ public static class ServiceCollectionExtensions
         services.AddValidatorsFromAssembly(applicationAssembly);
 
         services.AddScoped<IUserContext, UserContext>();
+        services.AddScoped<IUserConfirmationGuard, UserConfirmationGuard>();
         services.AddHttpContextAccessor();
 
         services.AddOptions<TapCheckoutOptions>()
