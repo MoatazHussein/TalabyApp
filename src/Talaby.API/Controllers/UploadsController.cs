@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using Talaby.Application.Features.Uploads.Commands.UploadFile;
 using Talaby.Application.Features.Uploads.Commands.UploadImage;
-using Talaby.API.Contracts.Uploads;
+using Talaby.API.Contracts;
 
 namespace Talaby.API.Controllers;
 

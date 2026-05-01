@@ -10,7 +10,10 @@ using Talaby.Domain.Repositories.Projects;
 namespace Talaby.Application.Features.Projects.ProjectProposals.Commands.UpdateProjectProposalStatus;
 
 public class UpdateProjectProposalStatusCommandHandler(ILogger<UpdateProjectProposalStatusCommandHandler> logger, IUserContext userContext,
-    IProjectRequestRepository projectRequestRepository, IProjectProposalRepository projectProposalRepository, IUnitOfWork unitOfWork)
+    IProjectRequestRepository projectRequestRepository,
+    IProjectProposalRepository projectProposalRepository,
+    IUnitOfWork unitOfWork,
+    IUserPolicyViolationService userPolicyViolationService)
     : IRequestHandler<UpdateProjectProposalStatusCommand>
 {
     public async Task Handle(UpdateProjectProposalStatusCommand request, CancellationToken cancellationToken)
@@ -73,6 +76,13 @@ public class UpdateProjectProposalStatusCommandHandler(ILogger<UpdateProjectProp
                 break;
 
             case ProjectProposalStatus.Cancelled:
+                if (projectProposal.Status == ProjectProposalStatus.Accepted)
+                {
+                    await userPolicyViolationService.RecordAcceptedProposalCancellationAsync(
+                        projectProposal,
+                        cancellationToken);
+                }
+
                 projectProposal.Cancel();
                 projectRequest.MarkOpen();
                 break;

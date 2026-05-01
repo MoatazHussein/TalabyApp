@@ -10,6 +10,7 @@ using Talaby.Application.Features.Projects.ProjectProposals.Queries.ProposalsByP
 using Talaby.Application.Features.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
 using Talaby.Application.Features.Projects.ProposalReplies.Queries.RepliesByProposalId;
 using Talaby.Application.Features.Projects.QuestionReplies.Queries.RepliesByQuestionId;
+using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities;
 using Talaby.Domain.Repositories;
 using Talaby.Domain.Repositories.Payments;
@@ -27,6 +28,7 @@ using Talaby.Infrastructure.Services.Identity;
 using Talaby.Infrastructure.Services.FileStorage;
 using Talaby.Infrastructure.Services.TimeConversion;
 using Talaby.Infrastructure.Services.UnitOfWork;
+using Talaby.Infrastructure.Services.UserPolicyViolations;
 using Talaby.Application.Features.Dashboard.Queries.Admin;
 using Talaby.Application.Features.Dashboard.Queries.Client;
 using Talaby.Application.Features.Dashboard.Queries.Store;
@@ -90,6 +92,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IStartupTask, EnsureStorageFoldersTask>();
         services.AddScoped<ITimeZoneConverter, TimeZoneConverter>();
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+        services.AddScoped<IUserPolicyViolationService, UserPolicyViolationService>();
 
 
         services.AddOptions<TapOptions>()

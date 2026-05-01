@@ -9,7 +9,8 @@ using Talaby.Domain.Repositories.Projects;
 namespace Talaby.Application.Features.Projects.ProjectRequests.Commands.UpdateProjectRequestStatus;
 
 public class UpdateProjectRequestStatusCommandHandler(ILogger<UpdateProjectRequestStatusCommandHandler> logger, IUserContext userContext,
-    IProjectRequestRepository projectRequestRepository) : IRequestHandler<UpdateProjectRequestStatusCommand>
+    IProjectRequestRepository projectRequestRepository,
+    IUserPolicyViolationService userPolicyViolationService) : IRequestHandler<UpdateProjectRequestStatusCommand>
 {
     public async Task Handle(UpdateProjectRequestStatusCommand request, CancellationToken cancellationToken)
     {
@@ -30,6 +31,10 @@ public class UpdateProjectRequestStatusCommandHandler(ILogger<UpdateProjectReque
         if (request.NewStatus != ProjectRequestStatus.Cancelled)
             throw new BusinessRuleException(
                 "Direct status updates are only permitted for cancellation.", 422);
+
+        await userPolicyViolationService.RecordAcceptedProjectCancellationAsync(
+            projectRequest.Id,
+            cancellationToken);
 
         projectRequest.MarkCancelled();
 
