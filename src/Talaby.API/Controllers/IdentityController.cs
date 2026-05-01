@@ -1,8 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Talaby.Application.Features.Users.Commands.AssignUserRole;
+using Talaby.Application.Features.Users.Commands.ActivateUser;
 using Talaby.Application.Features.Users.Commands.ConfirmEmail;
+using Talaby.Application.Features.Users.Commands.DisableUser;
 using Talaby.Application.Features.Users.Commands.ForgotPassword;
 using Talaby.Application.Features.Users.Commands.Login;
 using Talaby.Application.Features.Users.Commands.RegisterClient;
@@ -14,6 +17,7 @@ using Talaby.Application.Features.Users.Commands.UpdateUser;
 using Talaby.Application.Features.Users.Queries.GetAllUsers;
 using Talaby.Application.Features.Users.Queries.GetCurrentUser;
 using Talaby.Domain.Constants;
+using Talaby.API.Contracts;
 
 namespace Talaby.API.Controllers;
 
@@ -143,6 +147,27 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
             return BadRequestResponse("Update User Data Failed");
 
         return OkResponse("User Updated successfully");
+    }
+
+    [HttpPatch("users/{id}/disable")]
+    [Authorize(Roles = UserRoles.Admin)]
+    public async Task<IActionResult> DisableUser(
+        [FromRoute] Guid id,
+        [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] DisableUserRequest? request,
+        CancellationToken cancellationToken)
+    {
+        await mediator.Send(new DisableUserCommand(id, request?.DisabledUntil), cancellationToken);
+        return OkResponse("User disabled successfully");
+    }
+
+    [HttpPatch("users/{id}/activate")]
+    [Authorize(Roles = UserRoles.Admin)]
+    public async Task<IActionResult> ActivateUser(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        await mediator.Send(new ActivateUserCommand(id), cancellationToken);
+        return OkResponse("User activated successfully");
     }
 
 

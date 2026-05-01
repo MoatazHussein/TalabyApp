@@ -15,11 +15,17 @@ public class DashboardReadRepository(TalabyDbContext context) :
     public async Task<AdminDashboardDto> GetAdminDashboardAsync(CancellationToken cancellationToken = default)
     {
         var firstOfMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var now = DateTimeOffset.UtcNow;
 
         var userCounts = await context.Users
             .GroupBy(u => u.UserType)
             .Select(g => new { UserType = g.Key, Count = g.Count() })
             .ToListAsync(cancellationToken);
+
+        var totalUsers = userCounts.Sum(x => x.Count);
+
+        var disabledUsers = await context.Users
+            .CountAsync(u => u.LockoutEnd.HasValue && u.LockoutEnd > now, cancellationToken);
 
         var newUsersThisMonth = await context.Users
             .CountAsync(u => u.CreatedAt >= firstOfMonth, cancellationToken);
@@ -53,9 +59,11 @@ public class DashboardReadRepository(TalabyDbContext context) :
         {
             UserStats = new UserStatsDto
             {
-                TotalUsers = userCounts.Sum(x => x.Count),
+                TotalUsers = totalUsers,
                 TotalClients = userCounts.FirstOrDefault(x => x.UserType == UserType.Client)?.Count ?? 0,
                 TotalStores = userCounts.FirstOrDefault(x => x.UserType == UserType.Store)?.Count ?? 0,
+                ActiveUsers = totalUsers - disabledUsers,
+                DisabledUsers = disabledUsers,
                 NewUsersThisMonth = newUsersThisMonth
             },
             ProjectStats = new ProjectStatsDto

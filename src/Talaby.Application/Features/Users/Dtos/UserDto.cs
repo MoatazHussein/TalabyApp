@@ -14,6 +14,8 @@ public class UserDto
     public string UserTypeName { get; set; } = default!;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool EmailConfirmed { get; set; }
+    public bool IsDisabled { get; set; }
+    public DateTimeOffset? DisabledUntil { get; set; }
     public List<string> Roles { get; set; }
 
 

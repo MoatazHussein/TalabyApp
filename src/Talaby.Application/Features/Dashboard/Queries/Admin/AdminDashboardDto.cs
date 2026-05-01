@@ -13,6 +13,8 @@ public class UserStatsDto
     public int TotalUsers { get; set; }
     public int TotalClients { get; set; }
     public int TotalStores { get; set; }
+    public int ActiveUsers { get; set; }
+    public int DisabledUsers { get; set; }
     public int NewUsersThisMonth { get; set; }
 }
 
