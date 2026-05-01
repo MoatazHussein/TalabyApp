@@ -2,6 +2,7 @@
 using Serilog;
 using Talaby.API.Extensions;
 using Talaby.API.Middlewares;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Extensions;
 using Talaby.Infrastructure.Extensions;
 using Talaby.Infrastructure.Seeders;
@@ -29,6 +30,11 @@ var scope = app.Services.CreateScope();
 var seeder = scope.ServiceProvider.GetRequiredService<ITalabySeeder>();
 await seeder.Seed();
 
+var startupTasks = scope.ServiceProvider.GetServices<IStartupTask>();
+foreach (var startupTask in startupTasks)
+{
+    await startupTask.ExecuteAsync();
+}
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ErrorHandlingMiddleware>();

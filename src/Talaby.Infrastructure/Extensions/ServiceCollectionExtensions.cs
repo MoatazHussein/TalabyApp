@@ -24,11 +24,13 @@ using Talaby.Infrastructure.Seeders;
 using Talaby.Infrastructure.Services.DataVisibilityPolicy;
 using Talaby.Infrastructure.Services.Email;
 using Talaby.Infrastructure.Services.Identity;
+using Talaby.Infrastructure.Services.FileStorage;
 using Talaby.Infrastructure.Services.TimeConversion;
 using Talaby.Infrastructure.Services.UnitOfWork;
 using Talaby.Application.Features.Dashboard.Queries.Admin;
 using Talaby.Application.Features.Dashboard.Queries.Client;
 using Talaby.Application.Features.Dashboard.Queries.Store;
+using Talaby.Infrastructure.Startup;
 
 namespace Talaby.Infrastructure.Extensions;
 public static class ServiceCollectionExtensions
@@ -84,6 +86,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICommercialRegisterNumberMasker, CommercialRegisterNumberMasker>();
 
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddScoped<IStorageService, StorageService>();
+        services.AddScoped<IStartupTask, EnsureStorageFoldersTask>();
         services.AddScoped<ITimeZoneConverter, TimeZoneConverter>();
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
