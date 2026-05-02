@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Talaby.Application.Common;
 using Talaby.Application.Features.Payments.Commands.CreateProjectCommissionCheckout;
 using Talaby.Application.Features.Payments.Commands.SyncTapPaymentStatus;
 using Talaby.Application.Features.Payments.Queries.VerifyProjectCommissionPayment;
@@ -13,6 +14,8 @@ using Talaby.Application.Features.Projects.ProjectRequests.Commands.UpdateProjec
 using Talaby.Application.Features.Projects.ProjectRequests.Commands.UpdateProjectRequestStatus;
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.Dtos;
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetAllProjectRequests;
+using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetMyProjectRequests;
+using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetMyProjectRequests.Dtos;
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetProjectRequestById;
 using Talaby.Domain.Constants;
 
@@ -25,6 +28,14 @@ public class ProjectRequestsController(IMediator mediator) : BaseApiController
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProjectRequestDto>>> GetAll([FromQuery] GetAllProjectRequestsQuery query)
+    {
+        var projectRequests = await mediator.Send(query);
+        return OkResponse(projectRequests);
+    }
+
+    [HttpGet("me")]
+    [Authorize(Roles = UserRoles.Client)]
+    public async Task<ActionResult<PagedResult<MyProjectRequestDto>>> GetMyProjects([FromQuery] GetMyProjectRequestsQuery query)
     {
         var projectRequests = await mediator.Send(query);
         return OkResponse(projectRequests);

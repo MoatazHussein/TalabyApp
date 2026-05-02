@@ -5,6 +5,7 @@ using Talaby.Application.Features.Projects.ProjectProposals.Commands.CreateProje
 using Talaby.Application.Features.Projects.ProjectProposals.Commands.DeleteProjectProposal;
 using Talaby.Application.Features.Projects.ProjectProposals.Commands.UpdateProjectProposal;
 using Talaby.Application.Features.Projects.ProjectProposals.Commands.UpdateProjectProposalStatus;
+using Talaby.Application.Features.Projects.ProjectProposals.Queries.MyProjectProposals;
 using Talaby.Application.Features.Projects.ProposalReplies.Queries.RepliesByProposalId;
 using Talaby.Domain.Constants;
 namespace Talaby.API.Controllers.Projects;
@@ -18,6 +19,14 @@ public class ProjectProposalsController(IMediator mediator) : BaseApiController
     {
         var id = await mediator.Send(command);
         return OkResponse("Created Successfully");
+    }
+
+    [HttpGet("me")]
+    [Authorize(Roles = UserRoles.Store)]
+    public async Task<IActionResult> GetMyProposals([FromQuery] GetMyProjectProposalsQuery query)
+    {
+        var result = await mediator.Send(query);
+        return OkResponse(result);
     }
 
     [HttpPatch()]

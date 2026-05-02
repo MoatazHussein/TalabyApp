@@ -8,6 +8,7 @@ using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Payments.Contracts;
 using Talaby.Application.Features.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
 using Talaby.Application.Features.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
+using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetMyProjectRequests;
 using Talaby.Application.Features.Projects.ProposalReplies.Queries.RepliesByProposalId;
 using Talaby.Application.Features.Projects.QuestionReplies.Queries.RepliesByQuestionId;
 using Talaby.Application.Features.Users.Services;
@@ -56,6 +57,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITalabySeeder, TalabySeeder>();
         services.AddScoped<IStoreCategoryRepository, StoreCategoryRepository>();
         services.AddScoped<IProjectRequestRepository, ProjectRequestRepository>();
+        services.AddScoped<IProjectRequestReadRepository, ProjectRequestReadRepository>();
         services.AddScoped<IProjectProposalRepository, ProjectProposalRepository>();
         services.AddScoped<IProposalReplyRepository, ProposalReplyRepository>();
         services.AddScoped<IProjectProposalReadRepository, ProjectProposalReadRepository>();
