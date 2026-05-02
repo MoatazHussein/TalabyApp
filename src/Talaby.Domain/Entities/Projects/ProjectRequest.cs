@@ -18,6 +18,9 @@ public class ProjectRequest
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public ProjectRequestStatus Status { get; private set; } = ProjectRequestStatus.Open;
+    public string? CancellationReason { get; private set; }
+    public DateTime? CancelledAtUtc { get; private set; }
+    public Guid? CancelledByUserId { get; private set; }
 
     public ICollection<ProjectProposal> Proposals { get; set; } = new List<ProjectProposal>();
     public ICollection<ProjectQuestion> Questions { get; set; } = new List<ProjectQuestion>();
@@ -57,11 +60,14 @@ public class ProjectRequest
     }
 
     /// <summary>Cancels the request from any non-terminal state.</summary>
-    public void MarkCancelled()
+    public void MarkCancelled(string? cancellationReason, Guid cancelledByUserId)
     {
         if (Status == ProjectRequestStatus.Completed)
             throw new InvalidOperationException("Cannot cancel a completed project request.");
         if (Status == ProjectRequestStatus.Cancelled) return; 
+        CancellationReason = cancellationReason;
+        CancelledAtUtc = DateTime.UtcNow;
+        CancelledByUserId = cancelledByUserId;
         Status = ProjectRequestStatus.Cancelled;
     }
 }

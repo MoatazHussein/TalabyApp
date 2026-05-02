@@ -12,6 +12,7 @@ public class CreateProjectRequestCommandHandler(
     IProjectRequestRepository repository,
     IUserContext userContext,
     IUserConfirmationGuard userConfirmationGuard,
+    IUserActionGuard userActionGuard,
     ILogger<CreateProjectRequestCommandHandler> logger)
     : IRequestHandler<CreateProjectRequestCommand, Guid>
 {
@@ -20,6 +21,8 @@ public class CreateProjectRequestCommandHandler(
         await userConfirmationGuard.EnsureCurrentUserEmailConfirmedAsync(cancellationToken);
 
         var currentUser = userContext.GetCurrentUser();
+
+        await userActionGuard.EnsureCanCreateProjectAsync(currentUser.Id, cancellationToken);
 
         // Block creation if the client has an unpaid project awaiting commission payment.
         var hasUnpaidProject = await repository.AnyAsync(

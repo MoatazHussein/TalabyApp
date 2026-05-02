@@ -9,6 +9,9 @@ public class ProjectProposalListItemDto
     public decimal ProposedAmount { get; set; }
     public DateTime CreatedAt { get; set; }
     public ProjectProposalStatus Status { get; set; }
+    public string? CancellationReason { get; set; }
+    public DateTime? CancelledAtUtc { get; set; }
+    public Guid? CancelledByUserId { get; set; }
     public string CreatorEmail { get; set; } = default!;
     public string CreatorCommercialRegisterNumber { get; set; } = default!;
     public int RepliesCount { get; set; }

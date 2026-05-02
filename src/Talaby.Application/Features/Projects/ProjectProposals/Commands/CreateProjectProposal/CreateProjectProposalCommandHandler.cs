@@ -8,11 +8,16 @@ namespace Talaby.Application.Features.Projects.ProjectProposals.Commands.CreateP
 public class CreateProjectProposalCommandHandler(
     IProjectProposalRepository repository,
     IUserContext userContext,
-    IUserConfirmationGuard userConfirmationGuard) : IRequestHandler<CreateProjectProposalCommand, Guid>
+    IUserConfirmationGuard userConfirmationGuard,
+    IUserActionGuard userActionGuard) : IRequestHandler<CreateProjectProposalCommand, Guid>
 {
     public async Task<Guid> Handle(CreateProjectProposalCommand request, CancellationToken cancellationToken)
     {
         await userConfirmationGuard.EnsureCurrentUserEmailConfirmedAsync(cancellationToken);
+
+        var currentUser = userContext.GetCurrentUser();
+
+        await userActionGuard.EnsureCanCreateProposalAsync(currentUser.Id, cancellationToken);
 
         var proposal = new ProjectProposal
         {
@@ -20,7 +25,7 @@ public class CreateProjectProposalCommandHandler(
             ProjectRequestId = request.ProjectRequestId,
             Content = request.Content,
             ProposedAmount = request.ProposedAmount,
-            CreatorId = userContext.GetCurrentUser().Id,
+            CreatorId = currentUser.Id,
             CreatedAt = DateTime.UtcNow
         };
 

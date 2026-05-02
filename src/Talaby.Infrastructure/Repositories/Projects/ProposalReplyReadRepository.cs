@@ -34,6 +34,9 @@ public class ProposalReplyReadRepository(TalabyDbContext context) : IProposalRep
                 ProjectRequestCreatorEmail = q.ProjectRequest.Creator.Email,
                 Content = q.Content,
                 Status = q.Status,
+                CancellationReason = q.CancellationReason,
+                CancelledAtUtc = q.CancelledAtUtc,
+                CancelledByUserId = q.CancelledByUserId,
             })
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -83,6 +86,9 @@ public class ProposalReplyReadRepository(TalabyDbContext context) : IProposalRep
             ProjectRequestCreatorEmail = proposal.ProjectRequestCreatorEmail,
             ProposalContent = proposal.Content,
             ProposalStatus = proposal.Status,
+            CancellationReason = proposal.CancellationReason,
+            CancelledAtUtc = proposal.CancelledAtUtc,
+            CancelledByUserId = proposal.CancelledByUserId,
             Replies = new PagedResult<ProposalReplyDto>(items, totalCount, pageSize, pageNumber)
         };
     }

@@ -15,6 +15,9 @@ public class ProjectProposalConfiguration : IEntityTypeConfiguration<ProjectProp
                .IsRequired()
                .HasMaxLength(1000);
 
+        builder.Property(p => p.CancellationReason)
+               .HasMaxLength(500);
+
         builder.Property(p => p.ProposedAmount)
                .HasPrecision(18, 2) 
                .IsRequired();

@@ -48,6 +48,9 @@ public class ProjectProposalReadRepository(TalabyDbContext context) : IProjectPr
                 ProposedAmount = p.ProposedAmount,
                 CreatedAt = p.CreatedAt,
                 Status = p.Status,
+                CancellationReason = p.CancellationReason,
+                CancelledAtUtc = p.CancelledAtUtc,
+                CancelledByUserId = p.CancelledByUserId,
                 CreatorEmail = p.Creator.Email,
                 CreatorCommercialRegisterNumber = p.Creator.CommercialRegisterNumber!,
                 RepliesCount = p.Replies.Count

@@ -93,6 +93,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITimeZoneConverter, TimeZoneConverter>();
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();
         services.AddScoped<IUserPolicyViolationService, UserPolicyViolationService>();
+        services.AddScoped<IUserActionGuard, UserActionGuard>();
 
 
         services.AddOptions<TapOptions>()

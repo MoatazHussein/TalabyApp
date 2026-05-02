@@ -17,6 +17,9 @@ public class ProjectRequestConfiguration : IEntityTypeConfiguration<ProjectReque
         builder.Property(p => p.Description)
                .IsRequired();
 
+        builder.Property(p => p.CancellationReason)
+               .HasMaxLength(500);
+
         builder.Property(pr => pr.MinBudget)
                .IsRequired()
                .HasColumnType("decimal(18,2)");

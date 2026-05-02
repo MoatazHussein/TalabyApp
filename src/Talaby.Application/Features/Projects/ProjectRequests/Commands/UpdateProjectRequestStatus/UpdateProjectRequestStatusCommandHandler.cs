@@ -10,7 +10,9 @@ namespace Talaby.Application.Features.Projects.ProjectRequests.Commands.UpdatePr
 
 public class UpdateProjectRequestStatusCommandHandler(ILogger<UpdateProjectRequestStatusCommandHandler> logger, IUserContext userContext,
     IProjectRequestRepository projectRequestRepository,
-    IUserPolicyViolationService userPolicyViolationService) : IRequestHandler<UpdateProjectRequestStatusCommand>
+    IProjectProposalRepository projectProposalRepository,
+    IUserPolicyViolationService userPolicyViolationService,
+    IUserActionGuard userActionGuard) : IRequestHandler<UpdateProjectRequestStatusCommand>
 {
     public async Task Handle(UpdateProjectRequestStatusCommand request, CancellationToken cancellationToken)
     {
@@ -32,11 +34,23 @@ public class UpdateProjectRequestStatusCommandHandler(ILogger<UpdateProjectReque
             throw new BusinessRuleException(
                 "Direct status updates are only permitted for cancellation.", 422);
 
+        var hasAcceptedProposal = await projectProposalRepository.AnyAsync(
+            proposal => proposal.ProjectRequestId == projectRequest.Id
+                        && proposal.Status == ProjectProposalStatus.Accepted,
+            cancellationToken);
+
+        if (hasAcceptedProposal)
+        {
+            await userActionGuard.EnsureCanCancelAcceptedWorkAsync(
+                currentUser.Id,
+                cancellationToken);
+        }
+
         await userPolicyViolationService.RecordAcceptedProjectCancellationAsync(
             projectRequest.Id,
             cancellationToken);
 
-        projectRequest.MarkCancelled();
+        projectRequest.MarkCancelled(request.CancellationReason, currentUser.Id);
 
         await projectRequestRepository.SaveChanges();
     }

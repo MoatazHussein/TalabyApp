@@ -15,6 +15,9 @@ public class ProjectProposal
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public ProjectProposalStatus Status { get; private set; } = ProjectProposalStatus.Pending;
+    public string? CancellationReason { get; private set; }
+    public DateTime? CancelledAtUtc { get; private set; }
+    public Guid? CancelledByUserId { get; private set; }
 
     public ICollection<ProposalReply> Replies { get; set; } = new List<ProposalReply>();
 
@@ -36,11 +39,14 @@ public class ProjectProposal
         Status = ProjectProposalStatus.Rejected;
     }
 
-    public void Cancel()
+    public void Cancel(string? cancellationReason, Guid cancelledByUserId)
     {
         if (Status == ProjectProposalStatus.Cancelled) return; 
         if (Status == ProjectProposalStatus.Rejected)
             throw new InvalidOperationException("Cannot cancel an already-rejected proposal.");
+        CancellationReason = cancellationReason;
+        CancelledAtUtc = DateTime.UtcNow;
+        CancelledByUserId = cancelledByUserId;
         Status = ProjectProposalStatus.Cancelled;
     }
 

@@ -8,11 +8,8 @@ using Talaby.Infrastructure.Persistence;
 namespace Talaby.Infrastructure.Services.UserPolicyViolations;
 
 public class UserPolicyViolationService(
-    TalabyDbContext dbContext,
-    IUserStatusService userStatusService) : IUserPolicyViolationService
+    TalabyDbContext dbContext) : IUserPolicyViolationService
 {
-    private const int AutoDisableThreshold = 3;
-
     public async Task RecordAcceptedProjectCancellationAsync(
         Guid projectRequestId,
         CancellationToken cancellationToken = default)
@@ -75,23 +72,5 @@ public class UserPolicyViolationService(
             Reason = reason,
             OccurredAtUtc = DateTime.UtcNow
         });
-
-        var projectAlreadyCounted = await dbContext.UserPolicyViolations.AnyAsync(
-            violation => violation.UserId == userId
-                         && violation.ProjectRequestId == projectRequestId,
-            cancellationToken);
-
-        var distinctProjectCount = await dbContext.UserPolicyViolations
-            .Where(violation => violation.UserId == userId)
-            .Select(violation => violation.ProjectRequestId)
-            .Distinct()
-            .CountAsync(cancellationToken);
-
-        var newDistinctProjectCount = distinctProjectCount + (projectAlreadyCounted ? 0 : 1);
-
-        if (newDistinctProjectCount >= AutoDisableThreshold)
-        {
-            await userStatusService.DisableAsync(userId, null, cancellationToken);
-        }
     }
 }

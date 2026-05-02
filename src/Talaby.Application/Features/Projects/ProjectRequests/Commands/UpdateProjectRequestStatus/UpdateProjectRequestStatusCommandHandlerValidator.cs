@@ -12,5 +12,10 @@ public class UpdateProjectRequestStatusCommandHandlerValidator : AbstractValidat
             .WithMessage("Invalid status value.")
             .Must(s => s == ProjectRequestStatus.Cancelled)
             .WithMessage("Only Cancelled is allowed via this endpoint. Use dedicated endpoints for other transitions.");
+
+        RuleFor(x => x.CancellationReason)
+            .MaximumLength(500)
+            .When(x => x.CancellationReason is not null)
+            .WithMessage("Cancellation reason must not exceed 500 characters.");
     }
 }

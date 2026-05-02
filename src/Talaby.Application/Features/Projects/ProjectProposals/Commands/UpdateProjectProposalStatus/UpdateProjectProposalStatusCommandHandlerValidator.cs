@@ -9,5 +9,10 @@ public class UpdateProjectProposalStatusCommandHandlerValidator : AbstractValida
         RuleFor(x => x.NewStatus)
             .IsInEnum()
             .WithMessage("Invalid status value. Must be one of: Pending, Accepted, Rejected");
+
+        RuleFor(x => x.CancellationReason)
+            .MaximumLength(500)
+            .When(x => x.CancellationReason is not null)
+            .WithMessage("Cancellation reason must not exceed 500 characters.");
     }
 }

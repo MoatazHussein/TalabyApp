@@ -13,7 +13,8 @@ public class UpdateProjectProposalStatusCommandHandler(ILogger<UpdateProjectProp
     IProjectRequestRepository projectRequestRepository,
     IProjectProposalRepository projectProposalRepository,
     IUnitOfWork unitOfWork,
-    IUserPolicyViolationService userPolicyViolationService)
+    IUserPolicyViolationService userPolicyViolationService,
+    IUserActionGuard userActionGuard)
     : IRequestHandler<UpdateProjectProposalStatusCommand>
 {
     public async Task Handle(UpdateProjectProposalStatusCommand request, CancellationToken cancellationToken)
@@ -78,12 +79,16 @@ public class UpdateProjectProposalStatusCommandHandler(ILogger<UpdateProjectProp
             case ProjectProposalStatus.Cancelled:
                 if (projectProposal.Status == ProjectProposalStatus.Accepted)
                 {
+                    await userActionGuard.EnsureCanCancelAcceptedWorkAsync(
+                        currentUser.Id,
+                        cancellationToken);
+
                     await userPolicyViolationService.RecordAcceptedProposalCancellationAsync(
                         projectProposal,
                         cancellationToken);
                 }
 
-                projectProposal.Cancel();
+                projectProposal.Cancel(request.CancellationReason, currentUser.Id);
                 projectRequest.MarkOpen();
                 break;
 

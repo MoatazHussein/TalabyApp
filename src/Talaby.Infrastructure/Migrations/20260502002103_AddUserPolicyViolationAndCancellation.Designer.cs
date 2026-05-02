@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Talaby.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Talaby.Infrastructure.Persistence;
 namespace Talaby.Infrastructure.Migrations
 {
     [DbContext(typeof(TalabyDbContext))]
-    partial class TalabyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260502002103_AddUserPolicyViolationAndCancellation")]
+    partial class AddUserPolicyViolationAndCancellation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

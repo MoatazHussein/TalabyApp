@@ -12,6 +12,9 @@ public class ProposalWithRepliesDto
     public string ProjectRequestCreatorEmail { get; set; } = default!;
     public string ProposalContent { get; set; } = default!;
     public ProjectProposalStatus ProposalStatus { get; set; }
+    public string? CancellationReason { get; set; }
+    public DateTime? CancelledAtUtc { get; set; }
+    public Guid? CancelledByUserId { get; set; }
 
     public PagedResult<ProposalReplyDto> Replies { get; set; } = default!;
 }
