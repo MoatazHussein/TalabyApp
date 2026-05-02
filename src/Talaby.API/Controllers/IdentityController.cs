@@ -57,21 +57,21 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
         return OkResponse("Store registered successfully.");
     }
 
-    [HttpPost("userRole")]
-    [Authorize(Roles = UserRoles.Admin)]
-    public async Task<IActionResult> AssignUserRole(AssignUserRoleCommand command)
-    {
-        await mediator.Send(command);
-        return OkResponse("Done");
-    }
+    //[HttpPost("userRole")]
+    //[Authorize(Roles = UserRoles.Admin)]
+    //public async Task<IActionResult> AssignUserRole(AssignUserRoleCommand command)
+    //{
+    //    await mediator.Send(command);
+    //    return OkResponse("Done");
+    //}
 
-    [HttpDelete("userRole")]
-    [Authorize(Roles = UserRoles.Admin)]
-    public async Task<IActionResult> UnassignedUserRole(UnassignUserRoleCommand command)
-    {
-        await mediator.Send(command);
-        return OkResponse("Done");
-    }
+    //[HttpDelete("userRole")]
+    //[Authorize(Roles = UserRoles.Admin)]
+    //public async Task<IActionResult> UnassignedUserRole(UnassignUserRoleCommand command)
+    //{
+    //    await mediator.Send(command);
+    //    return OkResponse("Done");
+    //}
 
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommand command)
@@ -149,26 +149,26 @@ public class IdentityController(IMediator mediator, IConfiguration configuration
         return OkResponse("User Updated successfully");
     }
 
-    [HttpPatch("users/{id}/disable")]
-    [Authorize(Roles = UserRoles.Admin)]
-    public async Task<IActionResult> DisableUser(
-        [FromRoute] Guid id,
-        [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] DisableUserRequest? request,
-        CancellationToken cancellationToken)
-    {
-        await mediator.Send(new DisableUserCommand(id, request?.DisabledUntil), cancellationToken);
-        return OkResponse("User disabled successfully");
-    }
+    //[HttpPatch("users/{id}/disable")]
+    //[Authorize(Roles = UserRoles.Admin)]
+    //public async Task<IActionResult> DisableUser(
+    //    [FromRoute] Guid id,
+    //    [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] DisableUserRequest? request,
+    //    CancellationToken cancellationToken)
+    //{
+    //    await mediator.Send(new DisableUserCommand(id, request?.DisabledUntil), cancellationToken);
+    //    return OkResponse("User disabled successfully");
+    //}
 
-    [HttpPatch("users/{id}/activate")]
-    [Authorize(Roles = UserRoles.Admin)]
-    public async Task<IActionResult> ActivateUser(
-        [FromRoute] Guid id,
-        CancellationToken cancellationToken)
-    {
-        await mediator.Send(new ActivateUserCommand(id), cancellationToken);
-        return OkResponse("User activated successfully");
-    }
+    //[HttpPatch("users/{id}/activate")]
+    //[Authorize(Roles = UserRoles.Admin)]
+    //public async Task<IActionResult> ActivateUser(
+    //    [FromRoute] Guid id,
+    //    CancellationToken cancellationToken)
+    //{
+    //    await mediator.Send(new ActivateUserCommand(id), cancellationToken);
+    //    return OkResponse("User activated successfully");
+    //}
 
 
 }
