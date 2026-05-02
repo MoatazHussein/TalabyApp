@@ -21,14 +21,11 @@ public sealed class AdminPolicyViolationsController(IMediator mediator) : BaseAp
         return OkResponse(result);
     }
 
-    [HttpPatch("{violationId:guid}/review")]
+    [HttpPatch("review")]
     public async Task<IActionResult> ReviewPolicyViolation(
-        [FromRoute] Guid violationId,
         [FromBody] ReviewPolicyViolationCommand command,
         CancellationToken cancellationToken)
     {
-        command.ViolationId = violationId;
-
         await mediator.Send(command, cancellationToken);
 
         return OkResponse("Policy violation reviewed successfully");
