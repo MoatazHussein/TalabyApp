@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Talaby.Application.Features.Users.Services;
+using Talaby.Domain.Enums;
 using Talaby.Domain.Exceptions;
 using Talaby.Infrastructure.Persistence;
 
@@ -30,6 +31,7 @@ public class UserActionGuard(TalabyDbContext dbContext) : IUserActionGuard
     {
         var violationProjectCount = await dbContext.UserPolicyViolations
             .Where(violation => violation.UserId == userId)
+            .Where(violation => violation.ReviewStatus != UserPolicyViolationReviewStatus.Waived)
             .Select(violation => violation.ProjectRequestId)
             .Distinct()
             .CountAsync(cancellationToken);

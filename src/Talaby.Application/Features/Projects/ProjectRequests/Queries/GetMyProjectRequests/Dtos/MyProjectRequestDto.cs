@@ -15,7 +15,7 @@ public class MyProjectRequestDto
     public DateTime CreatedAt { get; set; }
     public ProjectRequestStatus Status { get; set; }
     public string? CancellationReason { get; set; }
-    public DateTime? CancelledAtUtc { get; set; }
+    public DateTime? CancelledAt { get; set; }
     public Guid? CancelledByUserId { get; set; }
     public int ProposalsCount { get; set; }
 }

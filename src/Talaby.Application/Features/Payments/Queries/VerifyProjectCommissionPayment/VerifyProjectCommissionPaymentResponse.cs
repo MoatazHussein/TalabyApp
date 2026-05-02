@@ -7,4 +7,4 @@ public sealed record VerifyProjectCommissionPaymentResponse(
     ProjectRequestStatus ProjectStatus,
     ProjectCommissionPaymentStatus? PaymentStatus,
     bool IsPaid,
-    DateTime? PaidAtUtc);
+    DateTime? PaidAt);

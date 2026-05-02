@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Constants;
 using Talaby.Domain.Enums;
@@ -13,6 +14,7 @@ public sealed class VerifyProjectCommissionPaymentQueryHandler(
     IProjectRequestRepository projectRequestRepository,
     IProjectCommissionPaymentRepository commissionPaymentRepository,
     IUserContext userContext,
+    ITimeZoneConverter timeZoneConverter,
     ILogger<VerifyProjectCommissionPaymentQueryHandler> logger)
     : IRequestHandler<VerifyProjectCommissionPaymentQuery, VerifyProjectCommissionPaymentResponse>
 {
@@ -39,11 +41,13 @@ public sealed class VerifyProjectCommissionPaymentQueryHandler(
             "Verify commission payment. ProjectRequestId={ProjectRequestId}, UserId={UserId}, ProjectStatus={ProjectStatus}, PaymentStatus={PaymentStatus}",
             request.ProjectRequestId, currentUser.Id, projectRequest.Status, commissionPayment?.Status);
 
-        return new VerifyProjectCommissionPaymentResponse(
+        var result = new VerifyProjectCommissionPaymentResponse(
             ProjectRequestId: request.ProjectRequestId,
             ProjectStatus: projectRequest.Status,
             PaymentStatus: commissionPayment?.Status,
             IsPaid: commissionPayment?.Status == ProjectCommissionPaymentStatus.Paid,
-            PaidAtUtc: commissionPayment?.PaidAtUtc);
+            PaidAt: commissionPayment?.PaidAtUtc);
+
+        return timeZoneConverter.ConvertUtcToLocal(result);
     }
 }

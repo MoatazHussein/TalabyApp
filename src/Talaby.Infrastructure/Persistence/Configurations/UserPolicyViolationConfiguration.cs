@@ -17,17 +17,23 @@ public class UserPolicyViolationConfiguration : IEntityTypeConfiguration<UserPol
         builder.Property(violation => violation.OccurredAtUtc)
             .IsRequired();
 
+        builder.Property(violation => violation.ReviewStatus)
+            .IsRequired();
+
+        builder.Property(violation => violation.ReviewNote)
+            .HasMaxLength(500);
+
         builder.HasOne(violation => violation.User)
             .WithMany()
             .HasForeignKey(violation => violation.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<ProjectRequest>()
+        builder.HasOne(violation => violation.ProjectRequest)
             .WithMany()
             .HasForeignKey(violation => violation.ProjectRequestId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<ProjectProposal>()
+        builder.HasOne(violation => violation.ProjectProposal)
             .WithMany()
             .HasForeignKey(violation => violation.ProjectProposalId)
             .OnDelete(DeleteBehavior.Restrict);

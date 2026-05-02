@@ -69,7 +69,7 @@ public class ProjectRequestReadRepository(TalabyDbContext context) : IProjectReq
                 CreatedAt = r.CreatedAt,
                 Status = r.Status,
                 CancellationReason = r.CancellationReason,
-                CancelledAtUtc = r.CancelledAtUtc,
+                CancelledAt = r.CancelledAtUtc,
                 CancelledByUserId = r.CancelledByUserId,
                 ProposalsCount = r.Proposals.Count
             })
