@@ -11,17 +11,16 @@ public class ProjectRequestRepository(TalabyDbContext dbContext)
 : IProjectRequestRepository
 {
 
-    public async Task<Guid> Create(ProjectRequest entity)
+    public Task<Guid> Create(ProjectRequest entity)
     {
         dbContext.ProjectRequests.Add(entity);
-        await dbContext.SaveChangesAsync();
-        return entity.Id;
+        return Task.FromResult(entity.Id);
     }
 
-    public async Task Delete(ProjectRequest entity)
+    public Task Delete(ProjectRequest entity)
     {
         dbContext.Remove(entity);
-        await dbContext.SaveChangesAsync();
+        return Task.CompletedTask;
     }
 
     public async Task<IEnumerable<ProjectRequest>> GetAllAsync(params Expression<Func<ProjectRequest, object>>[] includes)
@@ -98,8 +97,5 @@ public class ProjectRequestRepository(TalabyDbContext dbContext)
     {
         return await dbContext.ProjectRequests.AnyAsync(predicate, cancellationToken);
     }
-
-    public Task SaveChanges()
-     => dbContext.SaveChangesAsync();
 
 }

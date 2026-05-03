@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Exceptions;
@@ -9,7 +10,7 @@ using Talaby.Domain.Repositories.Projects;
 namespace Talaby.Application.Features.Projects.QuestionReplies.Commands.UpdateQuestionReply;
 
 public class UpdateQuestionReplyCommandHandler(ILogger<UpdateQuestionReplyCommandHandler> logger,IUserContext userContext,
-    IQuestionReplyRepository questionReplyRepository, IMapper mapper) : IRequestHandler<UpdateQuestionReplyCommand>
+    IQuestionReplyRepository questionReplyRepository, IMapper mapper, IUnitOfWork unitOfWork) : IRequestHandler<UpdateQuestionReplyCommand>
 {
     public async Task Handle(UpdateQuestionReplyCommand request, CancellationToken cancellationToken)
     {
@@ -28,6 +29,6 @@ public class UpdateQuestionReplyCommandHandler(ILogger<UpdateQuestionReplyComman
 
         mapper.Map(request, questionReply);
 
-        await questionReplyRepository.SaveChanges();
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

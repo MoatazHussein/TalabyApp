@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Enums;
@@ -13,7 +14,8 @@ public class CreateProjectRequestCommandHandler(
     IUserContext userContext,
     IUserConfirmationGuard userConfirmationGuard,
     IUserActionGuard userActionGuard,
-    ILogger<CreateProjectRequestCommandHandler> logger)
+    ILogger<CreateProjectRequestCommandHandler> logger,
+    IUnitOfWork unitOfWork)
     : IRequestHandler<CreateProjectRequestCommand, Guid>
 {
     public async Task<Guid> Handle(CreateProjectRequestCommand request, CancellationToken cancellationToken)
@@ -54,6 +56,7 @@ public class CreateProjectRequestCommandHandler(
         };
 
         await repository.Create(entity);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return entity.Id;
     }

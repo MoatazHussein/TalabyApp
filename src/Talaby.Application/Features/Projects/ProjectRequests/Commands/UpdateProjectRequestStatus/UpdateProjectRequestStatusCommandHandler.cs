@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Enums;
@@ -12,7 +13,8 @@ public class UpdateProjectRequestStatusCommandHandler(ILogger<UpdateProjectReque
     IProjectRequestRepository projectRequestRepository,
     IProjectProposalRepository projectProposalRepository,
     IUserPolicyViolationService userPolicyViolationService,
-    IUserActionGuard userActionGuard) : IRequestHandler<UpdateProjectRequestStatusCommand>
+    IUserActionGuard userActionGuard,
+    IUnitOfWork unitOfWork) : IRequestHandler<UpdateProjectRequestStatusCommand>
 {
     public async Task Handle(UpdateProjectRequestStatusCommand request, CancellationToken cancellationToken)
     {
@@ -52,6 +54,6 @@ public class UpdateProjectRequestStatusCommandHandler(ILogger<UpdateProjectReque
 
         projectRequest.MarkCancelled(request.CancellationReason, currentUser.Id);
 
-        await projectRequestRepository.SaveChanges();
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

@@ -8,6 +8,5 @@ public interface IProjectQuestionRepository
     Task<ProjectQuestion?> GetByIdAsync(Guid id, params Expression<Func<ProjectQuestion, object>>[] includes);
     Task<bool> AnyAsync(Expression<Func<ProjectQuestion, bool>> predicate, CancellationToken cancellationToken);
     Task<Guid> Create(ProjectQuestion entity);
-    Task SaveChanges();
     Task Delete(ProjectQuestion entity);
 }

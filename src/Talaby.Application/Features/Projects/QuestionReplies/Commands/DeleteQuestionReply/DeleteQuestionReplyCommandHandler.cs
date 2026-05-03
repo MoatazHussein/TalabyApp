@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Exceptions;
@@ -8,7 +9,8 @@ using Talaby.Domain.Repositories.Projects;
 namespace Talaby.Application.Features.Projects.QuestionReplies.Commands.DeleteQuestionReply
 {
     internal class DeleteQuestionReplyCommandHandler(ILogger<DeleteQuestionReplyCommandHandler> logger,IUserContext userContext,
-    IQuestionReplyRepository questionReplyRepository) : IRequestHandler<DeleteQuestionReplyCommand>
+    IQuestionReplyRepository questionReplyRepository,
+    IUnitOfWork unitOfWork) : IRequestHandler<DeleteQuestionReplyCommand>
     {
         public async Task Handle(DeleteQuestionReplyCommand request, CancellationToken cancellationToken)
         {
@@ -25,6 +27,7 @@ namespace Talaby.Application.Features.Projects.QuestionReplies.Commands.DeleteQu
                 throw new BusinessRuleException("You are not allowed to delete this Reply.", 403);
 
             await questionReplyRepository.Delete(questionReply);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
         }
     }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities;
 using Talaby.Domain.Exceptions;
@@ -9,7 +10,7 @@ using Talaby.Domain.Repositories;
 namespace Talaby.Application.Features.StoreCategories.Commands.CreateStoreCategory;
 
 public class CreateStoreCategoryCommandHandler(ILogger<CreateStoreCategoryCommandHandler> logger, IMapper mapper, IStoreCategoryRepository storeCategoryRepository
-     , IUserContext userContext) : IRequestHandler<CreateStoreCategoryCommand, int>
+     , IUserContext userContext, IUnitOfWork unitOfWork) : IRequestHandler<CreateStoreCategoryCommand, int>
 {
     public async Task<int> Handle(CreateStoreCategoryCommand request, CancellationToken cancellationToken)
     {
@@ -26,8 +27,9 @@ public class CreateStoreCategoryCommandHandler(ILogger<CreateStoreCategoryComman
         var storeCategory = mapper.Map<StoreCategory>(request);
 
 
-        int id = await storeCategoryRepository.Create(storeCategory);
+        await storeCategoryRepository.Create(storeCategory);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return id;
+        return storeCategory.Id;
     }
 }

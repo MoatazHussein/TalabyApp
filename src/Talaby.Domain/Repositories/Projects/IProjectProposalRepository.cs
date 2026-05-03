@@ -10,11 +10,5 @@ public interface IProjectProposalRepository
     Task<IEnumerable<ProjectProposal>> GetAllAsync(Expression<Func<ProjectProposal, bool>> predicate, CancellationToken cancellationToken = default);
     Task<bool> AnyAsync(Expression<Func<ProjectProposal, bool>> predicate, CancellationToken cancellationToken);
     Task<Guid> Create(ProjectProposal entity);
-    Task SaveChanges();
-    Task BulkUpdateAsync(
-    Expression<Func<ProjectProposal, bool>> predicate,
-    Expression<Func<SetPropertyCalls<ProjectProposal>, SetPropertyCalls<ProjectProposal>>> updateExpression,
-    CancellationToken cancellationToken);
-
     Task Delete(ProjectProposal entity);
 }

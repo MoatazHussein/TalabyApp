@@ -27,17 +27,15 @@ public class QuestionReplyRepository(TalabyDbContext dbContext)
         return await dbContext.QuestionReplies.AnyAsync(predicate, cancellationToken);
     }
 
-    public async Task<Guid> Create(QuestionReply entity)
+    public Task<Guid> Create(QuestionReply entity)
     {
         dbContext.QuestionReplies.Add(entity);
-        await dbContext.SaveChangesAsync();
-        return entity.Id;
-    }
-    public async Task Delete(QuestionReply entity)
-    {
-        dbContext.Remove(entity);
-        await dbContext.SaveChangesAsync();
+        return Task.FromResult(entity.Id);
     }
 
-    public Task SaveChanges() => dbContext.SaveChangesAsync();
+    public Task Delete(QuestionReply entity)
+    {
+        dbContext.Remove(entity);
+        return Task.CompletedTask;
+    }
 }

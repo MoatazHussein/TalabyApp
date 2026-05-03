@@ -11,17 +11,16 @@ internal class StoreCategoryRepository(TalabyDbContext dbContext)
     : IStoreCategoryRepository
 {
 
-    public async Task<int> Create(StoreCategory entity)
+    public Task<int> Create(StoreCategory entity)
     {
         dbContext.StoreCategories.Add(entity);
-        await dbContext.SaveChangesAsync();
-        return entity.Id;
+        return Task.FromResult(entity.Id);
     }
 
-    public async Task Delete(StoreCategory entity)
+    public Task Delete(StoreCategory entity)
     {
         dbContext.Remove(entity);
-        await dbContext.SaveChangesAsync();
+        return Task.CompletedTask;
     }
 
     public async Task<IEnumerable<StoreCategory>> GetAllAsync()
@@ -80,8 +79,5 @@ internal class StoreCategoryRepository(TalabyDbContext dbContext)
     {
         return await dbContext.StoreCategories.AnyAsync(predicate, cancellationToken);
     }
-
-    public Task SaveChanges()
-     => dbContext.SaveChangesAsync();
 
 }

@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Enums;
@@ -9,7 +10,8 @@ using Talaby.Domain.Repositories.Projects;
 namespace Talaby.Application.Features.Projects.ProjectProposals.Commands.DeleteProjectProposal
 {
     internal class DeleteProjectProposalCommandHandler(ILogger<DeleteProjectProposalCommandHandler> logger,IUserContext userContext,
-    IProjectProposalRepository ProjectProposalRepository) : IRequestHandler<DeleteProjectProposalCommand>
+    IProjectProposalRepository ProjectProposalRepository,
+    IUnitOfWork unitOfWork) : IRequestHandler<DeleteProjectProposalCommand>
     {
         public async Task Handle(DeleteProjectProposalCommand request, CancellationToken cancellationToken)
         {
@@ -29,6 +31,7 @@ namespace Talaby.Application.Features.Projects.ProjectProposals.Commands.DeleteP
                 throw new BusinessRuleException($"Can't delete Proposal with {projectProposal.Status.ToString()} status", 409);
 
             await ProjectProposalRepository.Delete(projectProposal);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
         }
     }

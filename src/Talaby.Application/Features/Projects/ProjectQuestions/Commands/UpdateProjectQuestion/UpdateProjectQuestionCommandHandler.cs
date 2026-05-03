@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Exceptions;
@@ -10,7 +11,7 @@ using Talaby.Domain.Repositories.Projects;
 namespace Talaby.Application.Features.Projects.ProjectQuestions.Commands.UpdateProjectQuestion;
 
 public class UpdateProjectQuestionCommandHandler(ILogger<UpdateProjectQuestionCommandHandler> logger,IUserContext userContext,
-    IProjectQuestionRepository projectQuestionRepository, IMapper mapper) : IRequestHandler<UpdateProjectQuestionCommand>
+    IProjectQuestionRepository projectQuestionRepository, IMapper mapper, IUnitOfWork unitOfWork) : IRequestHandler<UpdateProjectQuestionCommand>
 {
     public async Task Handle(UpdateProjectQuestionCommand request, CancellationToken cancellationToken)
     {
@@ -27,6 +28,6 @@ public class UpdateProjectQuestionCommandHandler(ILogger<UpdateProjectQuestionCo
 
         mapper.Map(request, projectQuestion);
 
-        await projectQuestionRepository.SaveChanges();
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

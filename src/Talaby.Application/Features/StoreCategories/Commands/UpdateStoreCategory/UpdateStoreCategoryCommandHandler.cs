@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Domain.Exceptions;
 using Talaby.Domain.Repositories;
 
 namespace Talaby.Application.Features.StoreCategories.Commands.UpdateStoreCategory;
 
 public class UpdateStoreCategoryCommandHandler(ILogger<UpdateStoreCategoryCommandHandler> logger,
-    IStoreCategoryRepository storeCategoryRepository, IMapper mapper) : IRequestHandler<UpdateStoreCategoryCommand>
+    IStoreCategoryRepository storeCategoryRepository, IMapper mapper, IUnitOfWork unitOfWork) : IRequestHandler<UpdateStoreCategoryCommand>
 {
     public async Task Handle(UpdateStoreCategoryCommand request, CancellationToken cancellationToken)
     {
@@ -26,6 +27,6 @@ public class UpdateStoreCategoryCommandHandler(ILogger<UpdateStoreCategoryComman
 
 
         mapper.Map(request, StoreCategory);
-        await storeCategoryRepository.SaveChanges();
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

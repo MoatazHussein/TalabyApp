@@ -11,7 +11,6 @@ public interface IProjectRequestRepository
     Task<ProjectRequest?> GetByIdAsync(Guid id, params Expression<Func<ProjectRequest, object>>[] includes);
     Task<bool> AnyAsync(Expression<Func<ProjectRequest, bool>> predicate, CancellationToken cancellationToken);
     Task<Guid> Create(ProjectRequest entity);
-    Task SaveChanges();
     Task Delete(ProjectRequest entity);
 
 }

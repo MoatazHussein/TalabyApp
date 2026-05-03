@@ -35,28 +35,18 @@ public class ProjectProposalRepository(TalabyDbContext dbContext)
         return await dbContext.ProjectProposals.AnyAsync(predicate, cancellationToken);
     }
 
-    public async Task<Guid> Create(ProjectProposal entity)
+    public Task<Guid> Create(ProjectProposal entity)
     {
         dbContext.ProjectProposals.Add(entity);
-        await dbContext.SaveChangesAsync();
-        return entity.Id;
+        return Task.FromResult(entity.Id);
     }
-    public async Task Delete(ProjectProposal entity)
+
+    public Task Delete(ProjectProposal entity)
     {
         dbContext.Remove(entity);
-        await dbContext.SaveChangesAsync();
+        return Task.CompletedTask;
     }
 
-    public Task SaveChanges() => dbContext.SaveChangesAsync();
-
-    public async Task BulkUpdateAsync(
-    Expression<Func<ProjectProposal, bool>> predicate,
-    Expression<Func<SetPropertyCalls<ProjectProposal>, SetPropertyCalls<ProjectProposal>>> updateExpression,
-    CancellationToken cancellationToken)
-    {
-        await dbContext.ProjectProposals
-            .Where(predicate)
-            .ExecuteUpdateAsync(updateExpression, cancellationToken);
-    }
+  
 
 }

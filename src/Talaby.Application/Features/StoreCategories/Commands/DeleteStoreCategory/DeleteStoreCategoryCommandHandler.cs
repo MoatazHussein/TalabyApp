@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Domain.Entities;
 using Talaby.Domain.Exceptions;
 using Talaby.Domain.Repositories;
@@ -7,7 +8,8 @@ using Talaby.Domain.Repositories;
 namespace Talaby.Application.Features.StoreCategories.Commands.DeleteStoreCategory
 {
     internal class DeleteStoreCategoryCommandHandler(ILogger<DeleteStoreCategoryCommandHandler> logger,
-    IStoreCategoryRepository storeCategoryRepository) : IRequestHandler<DeleteStoreCategoryCommand>
+    IStoreCategoryRepository storeCategoryRepository,
+    IUnitOfWork unitOfWork) : IRequestHandler<DeleteStoreCategoryCommand>
     {
         public async Task Handle(DeleteStoreCategoryCommand request, CancellationToken cancellationToken)
         {
@@ -17,6 +19,7 @@ namespace Talaby.Application.Features.StoreCategories.Commands.DeleteStoreCatego
                 throw new NotFoundException(nameof(StoreCategory), request.Id.ToString());
 
             await storeCategoryRepository.Delete(storeCategory);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
         }
     }

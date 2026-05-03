@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Exceptions;
 using Talaby.Domain.Repositories.Projects;
@@ -7,7 +8,8 @@ using Talaby.Domain.Repositories.Projects;
 namespace Talaby.Application.Features.Projects.ProjectRequests.Commands.DeleteProjectRequest
 {
     internal class DeleteProjectRequestCommandHandler(ILogger<DeleteProjectRequestCommandHandler> logger,IUserContext userContext,
-    IProjectRequestRepository projectRequestRepository) : IRequestHandler<DeleteProjectRequestCommand>
+    IProjectRequestRepository projectRequestRepository,
+    IUnitOfWork unitOfWork) : IRequestHandler<DeleteProjectRequestCommand>
     {
         public async Task Handle(DeleteProjectRequestCommand request, CancellationToken cancellationToken)
         {
@@ -23,6 +25,7 @@ namespace Talaby.Application.Features.Projects.ProjectRequests.Commands.DeletePr
                 throw new BusinessRuleException("You are not allowed to delete this project.", 403);
 
             await projectRequestRepository.Delete(projectRequest);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
         }
     }

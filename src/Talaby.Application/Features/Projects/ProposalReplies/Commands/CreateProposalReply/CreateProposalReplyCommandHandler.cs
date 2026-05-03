@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Repositories.Projects;
@@ -8,7 +9,8 @@ namespace Talaby.Application.Features.Projects.ProposalReplies.Commands.CreatePr
 public class CreateProposalReplyCommandHandler(
     IProposalReplyRepository repository,
     IUserContext currentUser,
-    IUserConfirmationGuard userConfirmationGuard) : IRequestHandler<CreateProposalReplyCommand, Guid>
+    IUserConfirmationGuard userConfirmationGuard,
+    IUnitOfWork unitOfWork) : IRequestHandler<CreateProposalReplyCommand, Guid>
 {
     public async Task<Guid> Handle(CreateProposalReplyCommand request, CancellationToken cancellationToken)
     {
@@ -24,6 +26,7 @@ public class CreateProposalReplyCommandHandler(
         };
 
         await repository.Create(reply);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         return reply.Id;
     }
 }

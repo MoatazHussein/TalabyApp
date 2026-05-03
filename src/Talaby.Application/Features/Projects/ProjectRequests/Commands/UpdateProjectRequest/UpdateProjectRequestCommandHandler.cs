@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Users.Services;
 using Talaby.Domain.Entities.Projects;
 using Talaby.Domain.Exceptions;
@@ -9,7 +10,7 @@ using Talaby.Domain.Repositories.Projects;
 namespace Talaby.Application.Features.Projects.ProjectRequests.Commands.UpdateProjectRequest;
 
 public class UpdateProjectRequestCommandHandler(ILogger<UpdateProjectRequestCommandHandler> logger, IUserContext userContext,
-    IProjectRequestRepository projectRequestRepository, IMapper mapper) : IRequestHandler<UpdateProjectRequestCommand>
+    IProjectRequestRepository projectRequestRepository, IMapper mapper, IUnitOfWork unitOfWork) : IRequestHandler<UpdateProjectRequestCommand>
 {
     public async Task Handle(UpdateProjectRequestCommand request, CancellationToken cancellationToken)
     {
@@ -29,6 +30,6 @@ public class UpdateProjectRequestCommandHandler(ILogger<UpdateProjectRequestComm
 
         mapper.Map(request, projectRequest);
 
-        await projectRequestRepository.SaveChanges();
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

@@ -27,17 +27,15 @@ public class ProposalReplyRepository(TalabyDbContext dbContext)
         return await dbContext.ProposalReplies.AnyAsync(predicate, cancellationToken);
     }
 
-    public async Task<Guid> Create(ProposalReply entity)
+    public Task<Guid> Create(ProposalReply entity)
     {
         dbContext.ProposalReplies.Add(entity);
-        await dbContext.SaveChangesAsync();
-        return entity.Id;
-    }
-    public async Task Delete(ProposalReply entity)
-    {
-        dbContext.Remove(entity);
-        await dbContext.SaveChangesAsync();
+        return Task.FromResult(entity.Id);
     }
 
-    public Task SaveChanges() => dbContext.SaveChangesAsync();
+    public Task Delete(ProposalReply entity)
+    {
+        dbContext.Remove(entity);
+        return Task.CompletedTask;
+    }
 }
