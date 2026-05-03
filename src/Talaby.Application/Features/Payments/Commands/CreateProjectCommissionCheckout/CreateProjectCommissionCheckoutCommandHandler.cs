@@ -105,7 +105,7 @@ public class CreateProjectCommissionCheckoutCommandHandler(
             CustomerPhoneCountryCode: phoneCountry,
             CustomerPhoneNumber: phoneNumber,
             SourceId: tapOpts.SourceId,
-            RedirectUrl: $"{tapOpts.FrontendBaseUrl.TrimEnd('/')}/payment/result",
+            RedirectUrl: $"{tapOpts.FrontendBaseUrl.TrimEnd('/')}/payment/result?projectRequestId={request.ProjectRequestId}",
             PostUrl: $"{tapOpts.ApiPublicBaseUrl.TrimEnd('/')}/api/payments/tap/webhook"
             );
 
