@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using Talaby.Application.Common.Interfaces;
 using Talaby.Application.Features.Payments.Contracts;
+using Talaby.Application.Features.Payments.Queries.GetMyDueCommissionPayments;
 using Talaby.Application.Features.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
 using Talaby.Application.Features.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
 using Talaby.Application.Features.Projects.ProjectRequests.Queries.GetMyProjectRequests;
@@ -70,6 +71,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQuestionReplyReadRepository, QuestionReplyReadRepository>();
 
         services.AddScoped<IProjectCommissionPaymentRepository, ProjectCommissionPaymentRepository>();
+        services.AddScoped<ICommissionPaymentReadRepository, CommissionPaymentReadRepository>();
         services.AddScoped<IAdminDashboardReadRepository, DashboardReadRepository>();
         services.AddScoped<IClientDashboardReadRepository, DashboardReadRepository>();
         services.AddScoped<IStoreDashboardReadRepository, DashboardReadRepository>();

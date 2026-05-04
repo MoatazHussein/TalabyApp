@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Talaby.Application.Common;
 using Talaby.Application.Features.Payments.Commands.CreateProjectCommissionCheckout;
 using Talaby.Application.Features.Payments.Commands.SyncTapPaymentStatus;
+using Talaby.Application.Features.Payments.Queries.GetMyDueCommissionPayments;
 using Talaby.Application.Features.Payments.Queries.VerifyProjectCommissionPayment;
 using Talaby.Application.Features.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
 using Talaby.Application.Features.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
@@ -39,6 +40,15 @@ public class ProjectRequestsController(IMediator mediator) : BaseApiController
     {
         var projectRequests = await mediator.Send(query);
         return OkResponse(projectRequests);
+    }
+
+    [HttpGet("me/commission-payments/due")]
+    [Authorize(Roles = UserRoles.Client)]
+    public async Task<ActionResult<IReadOnlyList<DueCommissionPaymentDto>>> GetMyDueCommissionPayments(
+        CancellationToken cancellationToken)
+    {
+        var duePayments = await mediator.Send(new GetMyDueCommissionPaymentsQuery(), cancellationToken);
+        return OkResponse(duePayments);
     }
 
     [HttpGet("{id}")]
