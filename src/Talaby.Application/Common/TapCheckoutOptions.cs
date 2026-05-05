@@ -4,7 +4,7 @@ public sealed class TapCheckoutOptions
 {
     public const string SectionName = "Tap";
 
-    public string SourceId { get; init; } = "src_card";
+    public string SourceId { get; init; } = "src_all";
 
     public string FrontendBaseUrl { get; init; } = default!;
 

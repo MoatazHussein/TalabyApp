@@ -30,6 +30,7 @@ public static class ServiceCollectionExtensions
 
         services.AddOptions<TapCheckoutOptions>()
             .Bind(configuration.GetSection(TapCheckoutOptions.SectionName))
+            .Validate(opts => !string.IsNullOrWhiteSpace(opts.SourceId), "Tap:SourceId must be configured.")
             .Validate(opts => opts.CommissionPercentage > 0, "Tap:CommissionPercentage must be greater than zero.")
             .ValidateOnStart();
 
