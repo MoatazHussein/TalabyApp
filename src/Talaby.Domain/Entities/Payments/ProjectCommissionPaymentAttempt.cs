@@ -107,6 +107,8 @@ public class ProjectCommissionPaymentAttempt
 
     public void SetPaid(DateTime paidAtUtc)
     {
+        if (Status == ProjectCommissionPaymentAttemptStatus.Paid) return;
+
         Status = ProjectCommissionPaymentAttemptStatus.Paid;
         FailureReason = null;
         UpdatedAtUtc = NormalizeUtc(paidAtUtc);
@@ -114,6 +116,8 @@ public class ProjectCommissionPaymentAttempt
 
     public void SetFailed(string? failureReason, DateTime updatedAtUtc)
     {
+        if (Status == ProjectCommissionPaymentAttemptStatus.Failed) return;
+
         Status = ProjectCommissionPaymentAttemptStatus.Failed;
         FailureReason = failureReason?.Trim();
         UpdatedAtUtc = NormalizeUtc(updatedAtUtc);

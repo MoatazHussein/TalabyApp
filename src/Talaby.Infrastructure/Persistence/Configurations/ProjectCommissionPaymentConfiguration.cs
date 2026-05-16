@@ -39,6 +39,9 @@ public sealed class ProjectCommissionPaymentConfiguration : IEntityTypeConfigura
 
         builder.Property(x => x.PaidAtUtc);
 
+        builder.Property(x => x.RowVersion)
+            .IsRowVersion();
+
         builder.HasIndex(x => x.ProjectRequestId)
             .IsUnique();
 

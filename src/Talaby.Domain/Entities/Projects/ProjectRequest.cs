@@ -54,6 +54,8 @@ public class ProjectRequest
     /// <summary>AwaitingCommissionPayment → Completed: commission has been paid (used in a future phase).</summary>
     public void MarkCompleted()
     {
+        if (Status == ProjectRequestStatus.Completed) return;
+
         if (Status != ProjectRequestStatus.AwaitingCommissionPayment)
             throw new InvalidOperationException($"Cannot move to Completed from {Status}.");
         Status = ProjectRequestStatus.Completed;

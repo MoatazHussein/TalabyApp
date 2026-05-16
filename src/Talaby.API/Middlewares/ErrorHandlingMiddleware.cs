@@ -30,6 +30,18 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
         {
             await WriteErrorAsync(context, 500, ex.Message);
         }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            logger.LogWarning(ex,
+                "Concurrency conflict while updating database state. Path={Path}, Method={Method}",
+                context.Request.Path, context.Request.Method);
+
+            await WriteErrorAsync(
+                context,
+                409,
+                "This resource changed while processing. Please refresh and try again.",
+                "CONCURRENCY_CONFLICT");
+        }
         catch (DbUpdateException)
         {
             await WriteErrorAsync(context, 500, "Database update failed");

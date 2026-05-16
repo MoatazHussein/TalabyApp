@@ -58,6 +58,8 @@ public class ProjectCommissionPayment
 
     public DateTime? PaidAtUtc { get; private set; }
 
+    public byte[] RowVersion { get; private set; } = [];
+
     public ProjectRequest ProjectRequest { get; private set; } = default!;
 
     public ProjectProposal ProjectProposal { get; private set; } = default!;
@@ -91,6 +93,8 @@ public class ProjectCommissionPayment
 
     public void MarkFailed()
     {
+        if (Status == ProjectCommissionPaymentStatus.Failed) return;
+
         if (Status == ProjectCommissionPaymentStatus.Paid)
             throw new InvalidOperationException("Paid payment cannot move to failed.");
 
@@ -99,6 +103,8 @@ public class ProjectCommissionPayment
 
     public void MarkPaid(DateTime paidAtUtc)
     {
+        if (Status == ProjectCommissionPaymentStatus.Paid) return;
+
         Status = ProjectCommissionPaymentStatus.Paid;
         PaidAtUtc = NormalizeUtc(paidAtUtc);
     }
