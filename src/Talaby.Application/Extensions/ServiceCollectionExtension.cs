@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Talaby.Application.Common;
 using Talaby.Application.Common.Behaviors;
+using Talaby.Application.Features.Payments.Services;
 using Talaby.Application.Features.Users.Services;
 
 namespace Talaby.Application.Extensions;
@@ -26,6 +27,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserConfirmationGuard, UserConfirmationGuard>();
         services.AddScoped<IEmailConfirmationService, EmailConfirmationService>();
         services.AddScoped<IUserStatusService, UserStatusService>();
+        services.AddScoped<ICommissionPaymentReconciler, CommissionPaymentReconciler>();
         services.AddHttpContextAccessor();
 
         services.AddOptions<TapCheckoutOptions>()

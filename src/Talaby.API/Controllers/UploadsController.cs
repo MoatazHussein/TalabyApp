@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using Talaby.Application.Features.Uploads.Commands.UploadFile;
@@ -7,7 +6,6 @@ using Talaby.API.Contracts;
 
 namespace Talaby.API.Controllers;
 
-[Authorize]
 [Route("api/uploads")]
 public class UploadsController(IMediator mediator) : BaseApiController
 {

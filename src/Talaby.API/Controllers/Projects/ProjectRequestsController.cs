@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Talaby.Application.Common;
 using Talaby.Application.Features.Payments.Commands.CreateProjectCommissionCheckout;
-using Talaby.Application.Features.Payments.Commands.SyncTapPaymentStatus;
+using Talaby.Application.Features.Payments.Commands.VerifyProjectCommissionPayment;
 using Talaby.Application.Features.Payments.Queries.GetMyDueCommissionPayments;
-using Talaby.Application.Features.Payments.Queries.VerifyProjectCommissionPayment;
 using Talaby.Application.Features.Projects.ProjectProposals.Queries.ProposalsByProjectRequestId;
 using Talaby.Application.Features.Projects.ProjectQuestions.Queries.QuestionsByProjectRequestId;
 using Talaby.Application.Features.Projects.ProjectRequests.Commands.CreateProjectRequest;
@@ -142,15 +141,13 @@ public class ProjectRequestsController(IMediator mediator) : BaseApiController
         return OkResponse(result);
     }
 
-    [HttpGet("{id}/commission-payment/verify")]
+    [HttpPost("{id}/commission-payment/verify")]
     public async Task<ActionResult<VerifyProjectCommissionPaymentResponse>> VerifyCommissionPayment(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        await mediator.Send(new SyncTapPaymentStatusCommand(id), cancellationToken);
-
         var result = await mediator.Send(
-            new VerifyProjectCommissionPaymentQuery(id), cancellationToken);
+            new VerifyProjectCommissionPaymentCommand(id), cancellationToken);
         return OkResponse(result);
     }
 

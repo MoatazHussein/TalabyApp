@@ -1,6 +1,6 @@
 using Talaby.Domain.Enums;
 
-namespace Talaby.Application.Features.Payments.Queries.VerifyProjectCommissionPayment;
+namespace Talaby.Application.Features.Payments.Commands.VerifyProjectCommissionPayment;
 
 public sealed record VerifyProjectCommissionPaymentResponse(
     Guid ProjectRequestId,

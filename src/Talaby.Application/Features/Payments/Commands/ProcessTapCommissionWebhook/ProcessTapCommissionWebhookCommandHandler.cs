@@ -1,19 +1,19 @@
 using System.Text.Json;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Talaby.Application.Features.Payments.Contracts;
 using Talaby.Application.Common.Interfaces;
+using Talaby.Application.Features.Payments.Contracts;
+using Talaby.Application.Features.Payments.Services;
 using Talaby.Domain.Enums;
 using Talaby.Domain.Exceptions;
 using Talaby.Domain.Repositories.Payments;
-using Talaby.Domain.Repositories.Projects;
 
 namespace Talaby.Application.Features.Payments.Commands.ProcessTapCommissionWebhook;
 
 public sealed class ProcessTapCommissionWebhookCommandHandler(
     ITapWebhookValidator webhookValidator,
     IProjectCommissionPaymentRepository commissionPaymentRepository,
-    IProjectRequestRepository projectRequestRepository,
+    ICommissionPaymentReconciler reconciler,
     IUnitOfWork unitOfWork,
     ILogger<ProcessTapCommissionWebhookCommandHandler> logger)
     : IRequestHandler<ProcessTapCommissionWebhookCommand>
@@ -100,50 +100,11 @@ public sealed class ProcessTapCommissionWebhookCommandHandler(
             return;
         }
 
-        // 6. Map provider status and apply domain transitions.
+        // 6. Map provider status and delegate the state transition + save.
         var outcome = TapChargeStatusMapper.Map(chargeStatus);
-        var now = DateTime.UtcNow;
 
-        switch (outcome)
-        {
-            case TapChargeOutcome.Success:
-                attempt.SetPaid(now);
-                commissionPayment.MarkPaid(now);
-
-                var projectRequest = await projectRequestRepository
-                    .GetByIdAsync(commissionPayment.ProjectRequestId);
-
-                if (projectRequest is null)
-                {
-                    logger.LogError(
-                        "Tap webhook: ProjectRequest {ProjectRequestId} not found for ChargeId={ChargeId}.",
-                        commissionPayment.ProjectRequestId, chargeId);
-                    throw new InvalidOperationException(
-                        $"ProjectRequest {commissionPayment.ProjectRequestId} not found.");
-                }
-
-                projectRequest.MarkCompleted();
-
-                logger.LogInformation(
-                    "Commission payment confirmed via webhook. ProjectRequestId={ProjectRequestId}, CommissionPaymentId={CommissionPaymentId}, AttemptId={AttemptId}, ChargeId={ChargeId}",
-                    projectRequest.Id, commissionPayment.Id, attempt.Id, chargeId);
-                break;
-
-            case TapChargeOutcome.TerminalFailure:
-                attempt.SetFailed(failureMessage, now);
-                commissionPayment.MarkFailed();
-
-                logger.LogWarning(
-                    "Commission payment failed via webhook. CommissionPaymentId={CommissionPaymentId}, AttemptId={AttemptId}, ChargeId={ChargeId}, ProviderStatus={ProviderStatus}, Reason={Reason}",
-                    commissionPayment.Id, attempt.Id, chargeId, chargeStatus, failureMessage);
-                break;
-
-            default:
-                logger.LogInformation(
-                    "Tap webhook received non-terminal status {Status} for ChargeId={ChargeId}. No action taken.",
-                    chargeStatus, chargeId);
-                return;
-        }
+        await reconciler.ApplyChargeOutcomeAsync(
+            commissionPayment, attempt, outcome, failureMessage, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }

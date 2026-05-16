@@ -19,7 +19,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin",
         builder => builder
         //.AllowAnyOrigin()
-        .WithOrigins("http://localhost:3000", "https://talaby.vercel.app")
+        .WithOrigins("http://localhost:3000", "https://talaby.vercel.app", "https://www.talaby.net")
         .AllowAnyHeader()
         .AllowAnyMethod());
 });
